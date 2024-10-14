@@ -13,6 +13,7 @@ export class World
         //     new THREE.BoxGeometry(1, 1, 1),
         //     new THREE.MeshNormalMaterial()
         // )
+        // this.dummy.position.x = 1
         // this.scene.add(this.dummy)
 
         const axesHelper = new THREE.AxesHelper()

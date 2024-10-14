@@ -75,8 +75,14 @@ export class Vehicle
             wheelEngineForce = -1
 
         for(let i = 0; i < 4; i++)
-        {
             this.controller.setWheelEngineForce(i, wheelEngineForce)
-        }
+
+        let steering = 0
+        if(this.game.controls.keys.right)
+            steering = -0.5
+        if(this.game.controls.keys.left)
+            steering = 0.5
+        this.controller.setWheelSteering(0, steering)
+        this.controller.setWheelSteering(2, steering)
     }
 }
