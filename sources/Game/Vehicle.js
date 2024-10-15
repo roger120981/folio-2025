@@ -11,52 +11,7 @@ export class Vehicle
 
         this.controller = this.game.physics.world.createVehicleController(this.chassis.physical.body)
 
-        const wheelGeneral = {
-            directionCs: new THREE.Vector3(0, -1, 0), // Suspension direction
-            axleCs: new THREE.Vector3(-1, 0, 0),      // Rotation axis
-            frictionSlip: 4   ,          // 10.5
-            maxSuspensionForce: 6000,    // 6000
-            maxSuspensionTravel: 5,      // 5
-            radius: 0.5,                 // No default
-            sideFrictionStiffness: 0.6,  // 1
-            suspensionCompression: 2,    // 0.83
-            suspensionRelaxation: 1.88,  // 0.88
-            suspensionRestLength: 0.125, // No default
-            suspensionStiffness: 30,     // 5.88
-            offset: new THREE.Vector3(0.65, -0.2,  0.75), // No default
-        }
-        const wheelsPositions = [
-            new THREE.Vector3(  wheelGeneral.offset.x, wheelGeneral.offset.y,   wheelGeneral.offset.z),
-            new THREE.Vector3(  wheelGeneral.offset.x, wheelGeneral.offset.y, - wheelGeneral.offset.z),
-            new THREE.Vector3(- wheelGeneral.offset.x, wheelGeneral.offset.y,   wheelGeneral.offset.z),
-            new THREE.Vector3(- wheelGeneral.offset.x, wheelGeneral.offset.y, - wheelGeneral.offset.z),
-        ]
-
-        for(let i = 0; i < 4; i++)
-        {
-            this.controller.addWheel(wheelsPositions[i], wheelGeneral.directionCs, wheelGeneral.axleCs, wheelGeneral.suspensionRestLength, wheelGeneral.radius)
-
-            // Don't change
-            // this.controller.setWheelAxleCs(i, wheelGeneral.axleCs)
-            // this.controller.setWheelDirectionCs(i, wheelGeneral.directionCs)
-
-            // Player controlled
-            // this.controller.setWheelBrake(i, )
-            // this.controller.setWheelEngineForce(i, )
-            // this.controller.setWheelSteering(i, )
-
-            // Can be tweaked
-            this.controller.setWheelChassisConnectionPointCs(i, wheelsPositions[i])
-            this.controller.setWheelFrictionSlip(i, wheelGeneral.frictionSlip)
-            this.controller.setWheelMaxSuspensionForce(i, wheelGeneral.maxSuspensionForce)
-            this.controller.setWheelMaxSuspensionTravel(i, wheelGeneral.maxSuspensionTravel)
-            this.controller.setWheelRadius(i, wheelGeneral.radius)
-            this.controller.setWheelSideFrictionStiffness(i, wheelGeneral.sideFrictionStiffness)
-            this.controller.setWheelSuspensionCompression(i, wheelGeneral.suspensionCompression)
-            this.controller.setWheelSuspensionRelaxation(i, wheelGeneral.suspensionRelaxation)
-            this.controller.setWheelSuspensionRestLength(i, wheelGeneral.suspensionRestLength)
-            this.controller.setWheelSuspensionStiffness(i, wheelGeneral.suspensionStiffness)
-        }
+        this.setWheels()
 
         this.game.time.events.on('tick', () =>
         {
@@ -67,8 +22,8 @@ export class Vehicle
     setChassis()
     {
         const visual = new THREE.Mesh(
-            new THREE.BoxGeometry(1 * 2, 0.5 * 2, 2 * 2),
-            new THREE.MeshNormalMaterial()
+            new THREE.BoxGeometry(1 * 2, 0.5 * 2, 1.5 * 2),
+            new THREE.MeshNormalMaterial({ wireframe: true })
         )
         this.game.world.scene.add(visual)
         this.chassis = this.game.physics.addEntity(
@@ -76,11 +31,76 @@ export class Vehicle
                 type: 'dynamic',
                 shape: 'cuboid',
                 position: { x: 0, y: 1, z: 0 },
-                colliders: [ { shape: 'cuboid', parameters: [ 1, 0.5, 2 ] } ],
-                canSleep: false
+                colliders: [ { shape: 'cuboid', parameters: [ 1, 0.5, 1.5 ] } ],
+                canSleep: false,
+                // linearDamping: 0.2
             },
             visual
         )
+    }
+
+    setWheels()
+    {
+        const wheelsSetting = {
+            directionCs: new THREE.Vector3(0, -1, 0), // Suspension direction
+            axleCs: new THREE.Vector3(-1, 0, 0),      // Rotation axis
+            frictionSlip: 4,             // 10.5
+            maxSuspensionForce: 6000,    // 6000
+            maxSuspensionTravel: 5,      // 5
+            radius: 0.5,                 // No default
+            sideFrictionStiffness: 0.6,  // 1
+            suspensionCompression: 2,    // 0.83
+            suspensionRelaxation: 1.88,  // 0.88
+            suspensionRestLength: 0.125, // No default
+            suspensionStiffness: 30,     // 5.88
+            offset: new THREE.Vector3(0.75, -0.2,  0.8), // No default
+        }
+        const wheelsPositions = [
+            new THREE.Vector3(  wheelsSetting.offset.x, wheelsSetting.offset.y,   wheelsSetting.offset.z),
+            new THREE.Vector3(  wheelsSetting.offset.x, wheelsSetting.offset.y, - wheelsSetting.offset.z),
+            new THREE.Vector3(- wheelsSetting.offset.x, wheelsSetting.offset.y,   wheelsSetting.offset.z),
+            new THREE.Vector3(- wheelsSetting.offset.x, wheelsSetting.offset.y, - wheelsSetting.offset.z),
+        ]
+
+        this.wheels = []
+
+        for(let i = 0; i < 4; i++)
+        {
+            const basePosition = wheelsPositions[i]
+            this.controller.addWheel(basePosition, wheelsSetting.directionCs, wheelsSetting.axleCs, wheelsSetting.suspensionRestLength, wheelsSetting.radius)
+
+            // Don't change
+            // this.controller.setWheelAxleCs(i, wheelsSetting.axleCs)
+            // this.controller.setWheelDirectionCs(i, wheelsSetting.directionCs)
+
+            // Player controlled
+            // this.controller.setWheelBrake(i, )
+            // this.controller.setWheelEngineForce(i, )
+            // this.controller.setWheelSteering(i, )
+
+            // Can be tweaked
+            this.controller.setWheelChassisConnectionPointCs(i, basePosition)
+            this.controller.setWheelFrictionSlip(i, wheelsSetting.frictionSlip)
+            this.controller.setWheelMaxSuspensionForce(i, wheelsSetting.maxSuspensionForce)
+            this.controller.setWheelMaxSuspensionTravel(i, wheelsSetting.maxSuspensionTravel)
+            this.controller.setWheelRadius(i, wheelsSetting.radius)
+            this.controller.setWheelSideFrictionStiffness(i, wheelsSetting.sideFrictionStiffness)
+            this.controller.setWheelSuspensionCompression(i, wheelsSetting.suspensionCompression)
+            this.controller.setWheelSuspensionRelaxation(i, wheelsSetting.suspensionRelaxation)
+            this.controller.setWheelSuspensionRestLength(i, wheelsSetting.suspensionRestLength)
+            this.controller.setWheelSuspensionStiffness(i, wheelsSetting.suspensionStiffness)
+
+            // Visual
+            const visual = new THREE.Mesh(
+                new THREE.CylinderGeometry(wheelsSetting.radius, wheelsSetting.radius, 0.5, 8),
+                new THREE.MeshNormalMaterial({ flatShading: true })
+            )
+            visual.geometry.rotateZ(Math.PI * 0.5)
+            visual.rotation.reorder('YXZ')
+            visual.position.copy(basePosition)
+            this.chassis.visual.add(visual)
+            this.wheels.push({ visual, basePosition })
+        }
     }
 
     update()
@@ -91,9 +111,6 @@ export class Vehicle
         if(this.game.controls.keys.down)
             wheelEngineForce = -10
 
-        for(let i = 0; i < 4; i++)
-            this.controller.setWheelEngineForce(i, wheelEngineForce)
-
         let steering = 0
         if(this.game.controls.keys.right)
             steering = -0.5
@@ -102,8 +119,17 @@ export class Vehicle
         this.controller.setWheelSteering(0, steering)
         this.controller.setWheelSteering(2, steering)
 
-
         for(let i = 0; i < 4; i++)
+        {
+            const wheel = this.wheels[i]
+            this.controller.setWheelEngineForce(i, wheelEngineForce)
             this.controller.setWheelBrake(i, 0.04)
+
+            wheel.visual.rotation.y = this.controller.wheelSteering(i)
+            wheel.visual.position.y = wheel.basePosition.y - this.controller.wheelSuspensionLength(i)
+
+            wheel.visual.rotation.x += wheelEngineForce * 0.01
+        }
+
     }
 }

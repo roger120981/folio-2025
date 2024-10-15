@@ -46,6 +46,9 @@ export class Physics
         if(typeof _physicalDescription.canSleep !== 'undefined')
             rigidBodyDesc.setCanSleep(_physicalDescription.canSleep)
 
+        if(typeof _physicalDescription.linearDamping !== 'undefined')
+            rigidBodyDesc.setLinearDamping(_physicalDescription.linearDamping)
+
         physical.body = this.world.createRigidBody(rigidBodyDesc)
 
 
