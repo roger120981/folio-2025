@@ -160,10 +160,17 @@ export class Vehicle
         this.controller.setWheelSteering(0, this.wheels.steering)
         this.controller.setWheelSteering(2, this.wheels.steering)
 
+        let brake = 0.04
+        if(this.game.controls.keys.brake)
+        {
+            this.wheels.engineForce *= 0.5
+            brake = 0.5
+        }
+
         for(let i = 0; i < 4; i++)
         {
+            this.controller.setWheelBrake(i, brake)
             this.controller.setWheelEngineForce(i, this.wheels.engineForce)
-            this.controller.setWheelBrake(i, 0.04)
         }
     }
 
