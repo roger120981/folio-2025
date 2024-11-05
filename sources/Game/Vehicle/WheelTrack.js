@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { Game } from '../Game.js'
-import { cos, sin, sign, atan2, varying, float, uv, texture, Fn, vec2, vec3, vec4, positionGeometry } from 'three'
+import { screenUV, mul, cos, sin, sign, atan2, varying, float, uv, texture, Fn, vec2, vec3, vec4, positionGeometry } from 'three'
 
 export class WheelTrack
 {
@@ -78,8 +78,20 @@ export class WheelTrack
         
         this.trail.material.outputNode = Fn(() =>
         {
-            const alpha = uv().x.smoothstep(0.5, 1).oneMinus().mul(trackData.a)
-            // trackData.a
+            const endAlpha = uv().x.smoothstep(0.5, 1).oneMinus()
+            const contactAlpha = trackData.a
+            const trackSideAlpha = mul(
+                uv().y.remapClamp(0, 0.2, 0, 1),
+                uv().y.remapClamp(0.8, 1, 1, 0)
+            )
+            const renderSideAlpha = mul(
+                screenUV.x.remapClamp(0, 0.2, 0, 1),
+                screenUV.x.remapClamp(0.8, 1, 1, 0),
+                screenUV.y.remapClamp(0, 0.2, 0, 1),
+                screenUV.y.remapClamp(0.8, 1, 1, 0),
+            )
+
+            const alpha = endAlpha.mul(contactAlpha).mul(trackSideAlpha).mul(renderSideAlpha)
             return vec4(uv(), 1, alpha)
         })()
         
