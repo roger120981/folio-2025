@@ -1,5 +1,6 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import * as THREE from 'three'
+
 import { Debug } from './Debug.js'
 import { Inputs } from './Inputs.js'
 import { Physics } from './Physics/Physics.js'
@@ -11,6 +12,7 @@ import { View } from './View.js'
 import { Viewport } from './Viewport.js'
 import { World } from './World/World.js'
 import { GroundData } from './GroundData/GroundData.js'
+import { Monitoring } from './Monitoring.js'
 
 export class Game
 {
@@ -66,14 +68,8 @@ export class Game
         this.vehicle = new Vehicle()
         this.view = new View()
         this.rendering = new Rendering()
+        this.monitoring = new Monitoring()
 
-        if(this.debug.active)
-        {
-            this.time.events.on('tick', () =>
-            {
-                this.debug.stats.update()
-            })
-        }
     }
 }
 

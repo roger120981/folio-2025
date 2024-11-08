@@ -19,7 +19,7 @@ npm run build
 
 | Order | Components |
 |---|---|
-| 1 | Inputs |
+| 0 | Inputs |
 | 1 | Vehicle (pre Physics) |
 | 2 | Physics |
 | 3 | View |
