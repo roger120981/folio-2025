@@ -116,8 +116,8 @@ export class Bushes
         })()
 
         const wind = getWind([this.resources.noisesTexture, positionLocal.xz])
-        // const multiplier = positionLocal.y.clamp(0, 1).mul(40.5)
-        // this.material.positionNode = positionLocal.add(vec3(wind.x, 0, wind.y).mul(multiplier))
+        const multiplier = positionLocal.y.clamp(0, 1).mul(10)
+        this.material.positionNode = positionLocal.add(vec3(wind.x, 0, wind.y).mul(multiplier))
 
         const timeOffset = float(vertexIndex).div(4).floor().div(100)
         const shakeStrength = smoothstep(0.1, 0.2, wind.length()).mul(0.2)

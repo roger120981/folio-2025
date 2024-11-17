@@ -1,6 +1,6 @@
 import { time, vec2, Fn, texture } from 'three'
 
-export default Fn(([ noisesTexture, position ]) =>
+export default Fn(([noisesTexture, position]) =>
 {
     const direction = vec2(
         -1,
