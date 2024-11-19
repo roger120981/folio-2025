@@ -35,12 +35,12 @@ export class Inputs
         this.pointer.upcoming = new THREE.Vector2()
         this.pointer.isDown = false
 
-        addEventListener('pointermove', (_event) =>
+        this.game.domElement.addEventListener('pointermove', (_event) =>
         {
             this.pointer.upcoming.set(_event.clientX, _event.clientY)
         })
 
-        addEventListener('pointerdown', (_event) =>
+        this.game.domElement.addEventListener('pointerdown', (_event) =>
         {
             this.pointer.isDown = true
         })
