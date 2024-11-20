@@ -61,6 +61,7 @@ export class Vehicle
                 child.material.shadowSide = THREE.BackSide
             }
         })
+        this.game.materials.updateObject(model)
         this.game.scene.add(model)
 
         this.chassis = this.game.physics.addEntity(
@@ -101,6 +102,7 @@ export class Vehicle
                 child.material.shadowSide = THREE.BackSide
             }
         })
+        this.game.materials.updateObject(this.wheels.model)
 
         // Geometry
         const wheelGeometry = new THREE.CylinderGeometry(1, 1, 0.5, 8)

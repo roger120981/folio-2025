@@ -18,10 +18,6 @@ export class Bushes
         this.setInstancedMesh()
     }
 
-    init()
-    {
-    }
-
     setGeometry()
     {
         const count = 80

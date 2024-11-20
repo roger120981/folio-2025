@@ -14,6 +14,7 @@ import { World } from './World/World.js'
 import { GroundData } from './GroundData/GroundData.js'
 import { Monitoring } from './Monitoring.js'
 import { Lighting } from './Ligthing.js'
+import { Materials } from './Materials.js'
 
 export class Game
 {
@@ -81,11 +82,12 @@ export class Game
             { name: 'hydraulicsBackLeft', keys: [ 'Numpad1' ] },
         ])
         this.viewport = new Viewport(this.domElement)
+        this.lighting = new Lighting()
+        this.materials = new Materials()
         this.physics = new Physics()
         this.groundData = new GroundData()
         this.view = new View()
         this.vehicle = new Vehicle()
-        this.lighting = new Lighting()
         this.world = new World()
         this.rendering = new Rendering()
         this.monitoring = new Monitoring()
