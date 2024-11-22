@@ -7,6 +7,7 @@ import { Bushes } from './Bushes.js'
 import { Floor } from './Floor.js'
 import { Grass } from './Grass.js'
 import { remap } from '../utilities/maths.js'
+import { Playground } from './Playground.js'
 
 export class World
 {
@@ -16,6 +17,7 @@ export class World
 
         this.floor = new Floor()
         this.grass = new Grass()
+        this.playground = new Playground()
         // this.setTestCube()
         this.setAxesHelper()
         this.setBushes()
@@ -109,9 +111,8 @@ export class World
             new THREE.BoxGeometry(1, 1, 1),
             new THREE.MeshNormalNodeMaterial()
         )
-        this.game.scene.add(visualCube)
 
-        this.game.physics.addEntity(
+        this.game.entities.add(
             {
                 type: 'dynamic',
                 position: { x: 0, y: 4, z: 0 },

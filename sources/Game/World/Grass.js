@@ -172,7 +172,7 @@ export class Grass
         {
             const debugPanel = this.game.debug.panel.addFolder({
                 title: '🌱 Grass',
-                expanded: true,
+                expanded: false,
             })
 
             debugPanel.addBinding({ color: colorA.value.getHex(THREE.SRGBColorSpace) }, 'color', { label: 'colorA', view: 'color' })

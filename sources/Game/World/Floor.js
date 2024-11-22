@@ -64,7 +64,7 @@ export class Floor
 
     setPhysical()
     {
-        this.game.physics.addEntity({
+        this.game.entities.add({
             type: 'fixed',
             colliders: [ { shape: 'cuboid', parameters: [ 1000, 1, 1000 ], position: { x: 0, y: - 1.01, z: 0 } } ]
         })

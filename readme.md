@@ -22,8 +22,10 @@ npm run build
 | 0 | Inputs |
 | 1 | Vehicle (pre Physics) |
 | 2 | Physics |
+| 3 | Entities |
 | 3 | View |
-| 4 | Vehicle (post Physics), PhysicsWireframe |
+| 4 | Vehicle (post Physics) |
+| 4 | PhysicsWireframe |
 | 5 | GroundData |
 | 6 | Grass |
 | 7 | Rendering |

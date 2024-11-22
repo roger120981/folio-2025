@@ -114,7 +114,7 @@ export class Bushes
         {
             const debugPanel = this.game.debug.panel.addFolder({
                 title: '🌳 Bushes',
-                expanded: true,
+                expanded: false,
             })
 
             debugPanel.addBinding({ color: colorA.value.getHex(THREE.SRGBColorSpace) }, 'color', { label: 'colorA', view: 'color' })

@@ -9,9 +9,7 @@ export class Physics
         this.game = new Game()
 
         this.world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 })
-        this.entities = new Map()
-        this.entitiesKey = 0
-
+        
         this.game.time.events.on('tick', () =>
         {
             this.update()
@@ -27,18 +25,6 @@ export class Physics
             })
             this.debugPanel.addBinding(this.world.gravity, 'y', { min: - 20, max: 20, step: 0.01 })
         }
-    }
-
-    addEntity(_physicalDescription = null, _visual = null)
-    {
-        const entity = {
-            physical: _physicalDescription ? this.getPhysical(_physicalDescription) : null,
-            visual: _visual
-        }
-        this.entitiesKey++
-        this.entities.set(this.entitiesKey, entity)
-
-        return entity
     }
 
     getPhysical(_physicalDescription)
@@ -67,8 +53,7 @@ export class Physics
 
         physical.body = this.world.createRigidBody(rigidBodyDesc)
 
-
-        // Coliders
+        // Colliders
         physical.colliders = []
         for(const _colliderDescription of _physicalDescription.colliders)
         {
@@ -76,9 +61,13 @@ export class Physics
 
             if(_colliderDescription.shape === 'cuboid')
                 colliderDescription = colliderDescription.cuboid(..._colliderDescription.parameters)
+            else if(_colliderDescription.shape === 'trimesh')
+                colliderDescription = colliderDescription.trimesh(..._colliderDescription.parameters)
 
             if(_colliderDescription.position)
                 colliderDescription = colliderDescription.setTranslation(_colliderDescription.position.x, _colliderDescription.position.y, _colliderDescription.position.z)
+            if(_colliderDescription.quaternion)
+                colliderDescription = colliderDescription.setRotation(_colliderDescription.quaternion)
 
             const collider = this.world.createCollider(colliderDescription, physical.body)
             physical.colliders.push(collider)
@@ -95,15 +84,6 @@ export class Physics
         this.world.vehicleControllers.forEach((_vehicleController) =>
         {
             _vehicleController.updateVehicle(this.world.timestep)
-        })
-
-        this.entities.forEach((_entity) =>
-        {
-            if(_entity.visual)
-            {
-                _entity.visual.position.copy(_entity.physical.body.translation())
-                _entity.visual.quaternion.copy(_entity.physical.body.rotation())
-            }
         })
     }
 }

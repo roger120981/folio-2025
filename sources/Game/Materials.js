@@ -14,7 +14,7 @@ export class Materials
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: '🎨 Materials',
-                expanded: true,
+                expanded: false,
             })
         }
 
@@ -49,7 +49,6 @@ export class Materials
                 material.color.multiplyScalar(material.userData.intensity / this.luminance.get(material.color))
             }
 
-            // console.log(material.color.getHex(THREE.SRGBColorSpace))
             const dummy = { color: material.color.getHex(THREE.SRGBColorSpace) }
             this.debugPanel.addBinding(material.userData, 'intensity', { min: 0, max: 300, step: 1 }).on('change', update)
             this.debugPanel.addBinding(dummy, 'color', { view: 'color' }).on('change', update)
@@ -73,8 +72,6 @@ export class Materials
         const emissiveRed = new THREE.MeshBasicNodeMaterial({ color: '#ff3131' })
         emissiveRed.name = 'emissiveRed'
         emissiveRed.userData.intensity = 100
-        console.log(emissiveRed.color)
-        console.log(this.luminance.get(emissiveRed.color))
         createEmissiveTweak(emissiveRed)
         emissiveRed.color.multiplyScalar(emissiveRed.userData.intensity / this.luminance.get(emissiveRed.color))
         this.save('emissiveRed', emissiveRed)
@@ -160,7 +157,7 @@ export class Materials
         this.tests.sphereGeometry = new THREE.IcosahedronGeometry(1, 3)
         this.tests.boxGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5)
         this.tests.group = new THREE.Group()
-        this.tests.group.visible = true
+        this.tests.group.visible = false
         this.game.scene.add(this.tests.group)
         
         this.tests.update = () =>

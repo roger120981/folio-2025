@@ -64,7 +64,6 @@ export class Vehicle
             }
         })
         this.game.materials.updateObject(this.parts.chassis)
-        this.game.scene.add(this.parts.chassis)
 
         // Blinker left
         this.parts.blinkerLeft = this.parts.chassis.getObjectByName('blinkerLeft')
@@ -92,7 +91,7 @@ export class Vehicle
 
     setChassis()
     {
-        this.chassis = this.game.physics.addEntity(
+        this.chassis = this.game.entities.add(
             {
                 type: 'dynamic',
                 position: { x: 0, y: 5, z: 0 },

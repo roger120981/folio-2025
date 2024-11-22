@@ -15,6 +15,7 @@ import { GroundData } from './GroundData/GroundData.js'
 import { Monitoring } from './Monitoring.js'
 import { Lighting } from './Ligthing.js'
 import { Materials } from './Materials.js'
+import { Entities } from './Entities.js'
 
 export class Game
 {
@@ -33,16 +34,16 @@ export class Game
             this.resourcesLoader = new ResourcesLoader()
             this.resourcesLoader.load(
                 [
-                    { path: 'matcaps/grassOnGreen.png', type: 'texture', name: 'matcapGrassOnGreen' },
                     { path: 'bush/bush-leaves-3.png', type: 'texture', name: 'bushLeaves' },
                     { path: 'noises-256x256.png', type: 'texture', name: 'noisesTexture' },
                     { path: 'vehicle/chassis.glb', type: 'gltf', name: 'vehicleChassis' },
                     { path: 'vehicle/wheel.glb', type: 'gltf', name: 'vehicleWheel' },
+                    { path: 'playground/playgroundVisual.glb', type: 'gltf', name: 'playgroundVisual' },
+                    { path: 'playground/playgroundPhysical.glb', type: 'gltf', name: 'playgroundPhysical' },
                 ],
                 (resources) =>
                 {
                     this.resources = resources
-                    this.resources.matcapGrassOnGreen.colorSpace = THREE.SRGBColorSpace
                     this.resources.noisesTexture.wrapS = THREE.RepeatWrapping
                     this.resources.noisesTexture.wrapT = THREE.RepeatWrapping
 
@@ -84,6 +85,7 @@ export class Game
         this.viewport = new Viewport(this.domElement)
         this.lighting = new Lighting()
         this.materials = new Materials()
+        this.entities = new Entities()
         this.physics = new Physics()
         this.groundData = new GroundData()
         this.view = new View()

@@ -46,7 +46,7 @@ export class Lighting
         {
             const debugPanel = this.game.debug.panel.addFolder({
                 title: '💡 Lights',
-                expanded: true,
+                expanded: false,
             })
 
             debugPanel.addBinding({ color: this.colorUniform.value.getHex(THREE.SRGBColorSpace) }, 'color', { view: 'color' })
