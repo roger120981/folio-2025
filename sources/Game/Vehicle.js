@@ -96,7 +96,7 @@ export class Vehicle
                 type: 'dynamic',
                 position: { x: 0, y: 5, z: 0 },
                 friction: 0.4,
-                // rotation: new THREE.Quaternion().setFromAxisAngle(new THREE.Euler(0, 0, 1), Math.PI * 0.5),
+                rotation: new THREE.Quaternion().setFromAxisAngle(new THREE.Euler(0, 1, 0), - Math.PI * 0.4),
                 colliders: [
                     { shape: 'cuboid', parameters: [ 1.5, 0.3, 0.85 ], position: { x: 0, y: - 0.07, z: 0 } },
                     { shape: 'cuboid', parameters: [ 0.5, 0.15, 0.65 ], position: { x: 0, y: 0.4, z: 0 } },
@@ -397,9 +397,9 @@ export class Vehicle
                 // Torque
                 let torqueY = 0
                 if(this.game.inputs.keys.left)
-                    torqueY = 8
+                    torqueY = 3 * (this.speed > - 0.1 ? 1 : - 1)
                 else if(this.game.inputs.keys.right)
-                    torqueY = -8
+                    torqueY = -3 * (this.speed > - 0.1 ? 1 : - 1)
 
                 const torque = new THREE.Vector3(0, torqueY, 0)
                 torque.applyQuaternion(this.chassis.physical.body.rotation())
