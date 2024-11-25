@@ -1,12 +1,8 @@
 import * as THREE from 'three'
-import { instance, Fn, vec2, vec3, mat4, attribute, positionLocal } from 'three'
 import { Game } from '../Game.js'
-
-import { Terrain } from './Terrain.js'
 import { Bushes } from './Bushes.js'
 import { Floor } from './Floor.js'
 import { Grass } from './Grass.js'
-import { remap } from '../utilities/maths.js'
 import { Playground } from './Playground.js'
 import { BricksWalls } from './BricksWalls.js'
 
@@ -23,7 +19,6 @@ export class World
         this.bricksWalls = new BricksWalls()
         // this.setTestCube()
         // this.setAxesHelper()
-        // this.setTest()
     }
 
     setAxesHelper()
@@ -48,75 +43,5 @@ export class World
             },
             visualCube
         )
-    }
-
-    setTest()
-    {
-        const geometry = new THREE.BoxGeometry(1, 1, 1, 10, 10, 10)
-        const count = 10
-
-        const material = new THREE.MeshBasicNodeMaterial({ wireframe: true })
-        const mesh = new THREE.Mesh(geometry, material)
-        mesh.count = count
-
-        const instanceMatrix = new THREE.InstancedBufferAttribute(new Float32Array(count * 16), 16)
-        instanceMatrix.setUsage(THREE.DynamicDrawUsage)
-
-        material.positionNode = Fn( ( { object } ) =>
-        {
-            instance(object.count, instanceMatrix).append()
-
-            const elevation = positionLocal.y.clamp(0, 1)
-            const fakeWind = vec2(1, 1)
-            return positionLocal.add(vec3(fakeWind.mul(elevation), 0).mul(3))
-        })()
-
-        this.game.scene.add(mesh)
-        
-        for(let i = 0; i < count; i++)
-        {
-            const x = (Math.random() - 0.5) * 10
-            const z = (Math.random() - 0.5) * 10
-
-            const position = new THREE.Vector3(x, 0, z)
-            const quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.random() * 999, 0))
-            const scale = new THREE.Vector3(1, 1, 1)
-
-            const matrix = new THREE.Matrix4()
-            matrix.compose(position, quaternion, scale)
-            matrix.toArray(instanceMatrix.array, i * 16)
-        }
-
-        // const geometry = new THREE.BoxGeometry(1, 1, 1, 10, 10, 10)
-        // const material = new THREE.MeshBasicNodeMaterial({ wireframe: true })
-        // const mesh = new THREE.Mesh(geometry, material)
-        // mesh.count = 10
-
-        // const instanceMatrix = new THREE.InstancedBufferAttribute(new Float32Array(mesh.count * 16), 16)
-        // instanceMatrix.setUsage(THREE.DynamicDrawUsage)
-
-        // mesh.material.positionNode = Fn( ( { object } ) =>
-        // {
-        //     instance(object.count, instanceMatrix).append()
-
-        //     return positionLocal
-        // } )()
-
-        // this.game.scene.add(mesh)
-
-        // for(let i = 0; i < mesh.count; i++)
-        // {
-        //     const x = (Math.random() - 0.5) * 10
-        //     const z = (Math.random() - 0.5) * 10
-
-        //     const position = new THREE.Vector3(x, 0, z)
-        //     const quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.random() * 999, 0))
-        //     const scale = new THREE.Vector3(1, 1, 1)
-
-        //     const matrix = new THREE.Matrix4()
-        //     matrix.compose(position, quaternion, scale)
-        //     matrix.toArray(instanceMatrix.array, i * 16)
-        // }
-        // // mesh.instanceMatrix.needsUpdate = true
     }
 }
