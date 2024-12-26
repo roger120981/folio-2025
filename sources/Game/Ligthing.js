@@ -19,9 +19,9 @@ export class Lighting
         this.count = 1
         this.lights = []
         this.mapSizeMin = 1024
-        this.shadowAmplitude = 25
+        this.shadowAmplitude = 20
         this.near = 1
-        this.depth = 100
+        this.depth = 60
         this.shadowBias = 0
         this.shadowNormalBias = 0
 
@@ -109,7 +109,7 @@ export class Lighting
         if(this.cyclesBased)
         {
             this.spherical.theta = this.theta + Math.sin((this.game.cycles.day.progress + 1/16) * Math.PI * 2) * 0.5
-            this.spherical.phi = Math.PI * 0.46 - (Math.cos((this.game.cycles.day.progress + 1/16) * Math.PI * 2) * 0.5 + 0.5) * 0.2
+            this.spherical.phi = Math.PI * 0.44 - (Math.cos((this.game.cycles.day.progress + 1/16) * Math.PI * 2) * 0.5 + 0.5) * 0.2
         }
         else
         {

@@ -125,7 +125,7 @@ export class Vehicle
         this.wheels.visualSteering = 0
         this.wheels.inContact = 0
         this.wheels.brakeStrength = 42
-        this.wheels.brakePerpetualStrength = 3
+        this.wheels.idleBrakeStrength = 15
         this.wheels.maxSpeed = 5
         this.wheels.maxSpeedBoost = 12
 
@@ -170,7 +170,7 @@ export class Vehicle
             frictionSlip: 0.9,
             maxSuspensionForce: 100,
             maxSuspensionTravel: 2,
-            sideFrictionStiffness: 0.6,
+            sideFrictionStiffness: 3,
             suspensionCompression: 10,
             suspensionRelaxation: 1.88,
             suspensionStiffness: 30,
@@ -226,14 +226,14 @@ export class Vehicle
             debugPanel.addBinding(this.wheels.settings, 'frictionSlip', { min: 0, max: 1, step: 0.01 }).on('change', this.wheels.updateSettings)
             debugPanel.addBinding(this.wheels.settings, 'maxSuspensionForce', { min: 0, max: 1000, step: 1 }).on('change', this.wheels.updateSettings)
             debugPanel.addBinding(this.wheels.settings, 'maxSuspensionTravel', { min: 0, max: 2, step: 0.01 }).on('change', this.wheels.updateSettings)
-            debugPanel.addBinding(this.wheels.settings, 'sideFrictionStiffness', { min: 0, max: 1, step: 0.01 }).on('change', this.wheels.updateSettings)
+            debugPanel.addBinding(this.wheels.settings, 'sideFrictionStiffness', { min: 0, max: 10, step: 0.01 }).on('change', this.wheels.updateSettings)
             debugPanel.addBinding(this.wheels.settings, 'suspensionCompression', { min: 0, max: 30, step: 0.01 }).on('change', this.wheels.updateSettings)
             debugPanel.addBinding(this.wheels.settings, 'suspensionRelaxation', { min: 0, max: 10, step: 0.01 }).on('change', this.wheels.updateSettings)
             debugPanel.addBinding(this.wheels.settings, 'suspensionStiffness', { min: 0, max: 100, step: 0.1 }).on('change', this.wheels.updateSettings)
             
             debugPanel.addBinding(this.wheels, 'steeringMax', { min: 0, max: Math.PI * 0.5, step: 0.01 })
             debugPanel.addBinding(this.wheels, 'brakeStrength', { min: 0, max: 1, step: 0.01 })
-            debugPanel.addBinding(this.wheels, 'brakePerpetualStrength', { min: 0, max: 0.2, step: 0.01 })
+            debugPanel.addBinding(this.wheels, 'idleBrakeStrength', { min: 0, max: 0.2, step: 0.01 })
             debugPanel.addBinding(this.wheels, 'engineForceMax', { min: 0, max: 2000, step: 0.01 })
             debugPanel.addBinding(this.wheels, 'engineBoostMultiplier', { min: 0, max: 5, step: 0.01 })
             debugPanel.addBinding(this.wheels, 'maxSpeed', { min: 1, max: 40, step: 0.01 })
@@ -533,7 +533,13 @@ export class Vehicle
         this.controller.setWheelSteering(0, this.wheels.steering)
         this.controller.setWheelSteering(1, this.wheels.steering)
 
-        let brake = this.wheels.brakePerpetualStrength
+        let brake = 0
+
+        if(
+            !this.game.inputs.keys.forward &&
+            !this.game.inputs.keys.backward
+        )
+            brake = this.wheels.idleBrakeStrength
 
         if(this.game.inputs.keys.brake || reverseBrake)
         {
