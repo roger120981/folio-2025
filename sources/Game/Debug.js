@@ -23,4 +23,26 @@ export class Debug
         return panel.addBinding({ color: object.getHex(THREE.SRGBColorSpace) }, 'color', { label: label, view: 'color' })
                     .on('change', tweak => { object.set(tweak.value) })
     }
+
+    addButtons(panel, buttons, title = '')
+    {
+        const buttonKeys = Object.keys(buttons)
+
+        panel
+            .addBlade({
+                view: 'buttongrid',
+                size: [ buttonKeys.length, 1 ],
+                cells: (x, y) => ({
+                    title: [
+                        buttonKeys,
+                    ][y][x],
+                }),
+                label: title,
+            })
+            .on('click', (event) =>
+            {
+                buttons[event.cell.title](event.cell.title)
+            })
+            
+    }
 }

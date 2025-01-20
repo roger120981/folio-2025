@@ -34,7 +34,7 @@ export class DayCycles
 
     setDay()
     {
-        this.progress = 0.2
+        this.progress = 0.38
         this.manualProgress = this.progress
         this.manualProgressChanged = true
         this.speed = 0.005
@@ -64,45 +64,48 @@ export class DayCycles
         // Debug
         if(this.game.debug.active)
         {
-            const debugPanel = this.debugPanel.addFolder({
-                title: 'Day',
-                expanded: true,
-            })
-            const tweak = debugPanel
+            const tweak = this.debugPanel
                 .addBinding(this, 'manualProgress', { min: 0, max: 1, step: 0.001 })
                 .on('change', () => { this.manualProgressChanged = true })
             this.tweaksToRefresh.push(tweak)
-            debugPanel.addBinding(this, 'speed', { min: 0, max: 1, step: 0.001 })
-            debugPanel.addBinding(this, 'auto')
+            this.debugPanel.addBinding(this, 'speed', { min: 0, max: 1, step: 0.001 })
+            this.debugPanel.addBinding(this, 'auto')
 
             const progresses = {
-                day: 0,
-                dusk: 0.25,
-                night: 0.35,
-                dawn: 0.8
+                day: () => { this.progress = 0 },
+                dusk: () => { this.progress = 0.25 },
+                night: () => { this.progress = 0.35 },
+                dawn: () => { this.progress = 0.8 }
             }
-            const progressesKeys = Object.keys(progresses)
 
-            debugPanel
-                .addBlade({
-                    view: 'buttongrid',
-                    size: [progressesKeys.length, 1],
-                    cells: (x, y) => ({
-                        title: [
-                            progressesKeys,
-                        ][y][x],
-                    }),
-                    label: 'jump',
-                })
-                .on('click', (event) =>
-                {
-                    this.progress = progresses[event.cell.title]
-                })
+            this.game.debug.addButtons(
+                this.debugPanel,
+                progresses,
+                'setTime'
+            )
+            
+            // const progressesKeys = Object.keys(progresses)
+
+            // this.debugPanel
+            //     .addBlade({
+            //         view: 'buttongrid',
+            //         size: [progressesKeys.length, 1],
+            //         cells: (x, y) => ({
+            //             title: [
+            //                 progressesKeys,
+            //             ][y][x],
+            //         }),
+            //         label: 'jump',
+            //     })
+            //     .on('click', (event) =>
+            //     {
+            //         this.progress = progresses[event.cell.title]
+            //     })
 
             for(const presetKey in presets)
             {
                 const preset = presets[presetKey]
-                const presetsDebugPanel = debugPanel.addFolder({
+                const presetsDebugPanel = this.debugPanel.addFolder({
                     title: presetKey,
                     expanded: true,
                 })

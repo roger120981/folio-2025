@@ -107,9 +107,9 @@ export class PoleLights
 
     setSwitchInterval()
     {
-        this.game.dayCycles.addIntervalEvent('poleLightsOn', 0.25, 0.7)
+        this.game.dayCycles.addIntervalEvent('poleLights', 0.25, 0.7)
 
-        this.game.dayCycles.events.on('poleLightsOn', (inInverval) =>
+        this.game.dayCycles.events.on('poleLights', (inInverval) =>
         {
             if(inInverval)
             {

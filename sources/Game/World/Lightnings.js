@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { attribute, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, color, cross, float, floor, Fn, instancedArray, min, modelWorldMatrix, mul, positionGeometry, step, uniform, vec4, vertexIndex } from 'three/tsl'
+import { attribute, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, color, cross, float, floor, Fn, instancedArray, min, modelWorldMatrix, mul, positionGeometry, step, uniform, varying, vec3, vec4, vertexIndex } from 'three/tsl'
 import { LineGeometry } from '../Geometries/LineGeometry.js'
 import gsap from 'gsap'
 
@@ -10,6 +10,9 @@ export class Lightnings
     {
         this.game = Game.getInstance()
 
+        this.nightChances = 0.25
+        this.hitChances = 0
+
         // Debug
         if(this.game.debug.active)
         {
@@ -17,7 +20,30 @@ export class Lightnings
                 title: '⚡️ Lightnings',
                 expanded: true,
             })
-            this.tweaksToRefresh = []
+
+            this.debugPanel.addBinding(this, 'nightChances', { min: 0, max: 1, step: 0.001 })
+            this.hitChancesTweak = this.debugPanel.addBinding(this, 'hitChances', { min: 0, max: 1, step: 0.001 })
+
+            this.game.debug.addButtons(
+                this.debugPanel,
+                {
+                    start: () => { this.start() },
+                    stop: () => {this.stop()  },
+                    create: () =>
+                    {
+                        const angle = Math.random() * Math.PI * 2
+                        const position = new THREE.Vector3(
+                            Math.cos(angle) + Math.cos(angle) * 2,
+                            0,
+                            Math.sin(angle) + Math.sin(angle) * 2
+                        )
+                        this.create(position)
+                    },
+                },
+                'actions'
+            )
+            
+            this.debugPanel.addBlade({ view: 'separator' })
         }
 
         this.materialReference = this.game.materials.createEmissive('lightnings', '#4c8bff', 4, this.debugPanel)
@@ -27,13 +53,6 @@ export class Lightnings
         this.setExplosionParticles()
         
         this.setInterval()
-
-        // Test
-        // setInterval(() =>
-        // {
-        //     this.create(new THREE.Vector3(22, 0, 1))
-        // }, 5000)
-        // this.create(new THREE.Vector3(22, 0, 1))
     }
 
     setAnticipationParticles()
@@ -57,7 +76,7 @@ export class Lightnings
             const angle = Math.PI * 2 * Math.random()
             const radius = Math.random() * 3
             positionArray[i3 + 0] = Math.sin(angle) * radius
-            positionArray[i3 + 1] = - Math.random() * 0.5
+            positionArray[i3 + 1] = - Math.random()
             positionArray[i3 + 2] = Math.cos(angle) * radius
 
             scaleArray[i] = Math.random() * 0.75 + 0.25
@@ -66,15 +85,15 @@ export class Lightnings
         this.anticipationParticles.positionAttribute = instancedArray(positionArray, 'vec3').toAttribute()
         this.anticipationParticles.scaleAttribute = instancedArray(scaleArray, 'float').toAttribute()
 
-        this.anticipationParticles.geometry = new THREE.PlaneGeometry()
-        this.anticipationParticles.geometry.rotateZ(Math.PI * 0.25)
-        this.anticipationParticles.geometry.rotateZ(Math.PI * 0.25)
+        this.anticipationParticles.geometry = new THREE.PlaneGeometry(1, 1)
+
+        const finalPosition = varying(vec3())
 
         // Position node
         this.anticipationParticles.positionNode = Fn(([_startTime]) =>
         {
             const localTime = this.game.time.elapsedScaledUniform.sub(_startTime)
-            const finalPosition = this.anticipationParticles.positionAttribute.toVar()
+            finalPosition.assign(this.anticipationParticles.positionAttribute)
             const timeProgress = min(localTime.div(this.anticipationParticles.duration), 1)
             
             finalPosition.y.addAssign(timeProgress.mul(elevationUniform))
@@ -88,7 +107,8 @@ export class Lightnings
             const localTime = this.game.time.elapsedScaledUniform.sub(_startTime)
             const duration = float(this.anticipationParticles.duration)
             const timeScale = localTime.remapClamp(duration.mul(0.5), duration, 1, 0)
-            const finalScale = this.anticipationParticles.scaleAttribute.mul(scaleUniform).mul(timeScale)
+            const elevationScale = finalPosition.y.remapClamp(0, 0.2, 0, 1)
+            const finalScale = this.anticipationParticles.scaleAttribute.mul(scaleUniform).mul(timeScale).mul(elevationScale)
             return finalScale
         })
 
@@ -106,7 +126,7 @@ export class Lightnings
             
             const mesh = new THREE.Mesh(this.anticipationParticles.geometry, material)
             mesh.position.copy(coordinates)
-            mesh.rotation.y = Math.random() * 2
+            mesh.rotation.y = Math.random() * Math.PI * 2
             mesh.count = this.anticipationParticles.count
             this.game.scene.add(mesh)
 
@@ -115,11 +135,12 @@ export class Lightnings
 
         if(this.game.debug.active)
         {
-            this.debugPanel
+            const debugPanel = this.debugPanel.addFolder({ title: 'Anticipation' })
+            debugPanel
                 .addBinding(this.anticipationParticles, 'duration', { min: 0, max: 10, step: 0.01 })
                 .on('change', () => { durationUniform.value = this.anticipationParticles.duration })
-            this.debugPanel.addBinding(scaleUniform, 'value', { label: 'anticipationParticlesScale', min: 0, max: 1, step: 0.001 })
-            this.debugPanel.addBinding(elevationUniform, 'value', { label: 'anticipationParticlesElevation', min: 0, max: 5, step: 0.01 })
+            debugPanel.addBinding(scaleUniform, 'value', { label: 'scale', min: 0, max: 1, step: 0.001 })
+            debugPanel.addBinding(elevationUniform, 'value', { label: 'elevation', min: 0, max: 5, step: 0.01 })
         }
     }
 
@@ -127,9 +148,6 @@ export class Lightnings
     {
         this.arc = {}
         this.arc.duration = 3
-
-        // Uniforms
-        const thickness = uniform(0.1)
 
         // Geometry
         const points = []
@@ -149,6 +167,11 @@ export class Lightnings
 
         this.arc.geometry = new LineGeometry(points)
 
+        // Uniforms
+        const thicknessUniform = uniform(0.1)
+        const easeOutUniform = uniform(5)
+        const driftAmplitudeUniform = uniform(1)
+
         // Vertex Node
         this.arc.vertexNode = Fn(([_startTime]) =>
         {
@@ -158,7 +181,7 @@ export class Lightnings
             const timeProgress = min(localTime.div(this.arc.duration), 1)
             
             const newPosition = positionGeometry.toVar()
-            newPosition.xz.mulAssign(timeProgress.oneMinus().pow(5).oneMinus().mul(tipness.oneMinus()).add(1))
+            newPosition.xz.mulAssign(timeProgress.oneMinus().pow(easeOutUniform).oneMinus().mul(tipness.oneMinus()).mul(driftAmplitudeUniform).add(1))
 
             const worldPosition = modelWorldMatrix.mul(vec4(newPosition, 1))
             const toCamera = worldPosition.xyz.sub(cameraPosition).normalize()
@@ -170,7 +193,7 @@ export class Lightnings
             
             const ratioThickness = ratio.mul(10).min(1)
             const timeThickness = timeProgress.oneMinus()
-            const finalThickness = mul(thickness, ratioThickness, timeThickness)
+            const finalThickness = mul(thicknessUniform, ratioThickness, timeThickness)
 
             const sideStep = floor(vertexIndex.toFloat().mul(3).sub(2).div(3).mod(2)).sub(0.5)
             const sideOffset = tangent.mul(sideStep.mul(finalThickness))
@@ -194,10 +217,19 @@ export class Lightnings
 
             const mesh = new THREE.Mesh(this.arc.geometry, material)
             mesh.position.copy(coordinates)
-            mesh.rotation.y = Math.random() * 2
+            mesh.rotation.y = Math.random() * Math.PI * 2
             this.game.scene.add(mesh)
             
             return mesh
+        }
+
+        if(this.game.debug.active)
+        {
+            const debugPanel = this.debugPanel.addFolder({ title: 'Arc' })
+            debugPanel.addBinding(this.arc, 'duration', { min: 0, max: 10, step: 0.01 })
+            debugPanel.addBinding(easeOutUniform, 'value', { label: 'easeOut', min: 1, max: 10, step: 1 })
+            debugPanel.addBinding(driftAmplitudeUniform, 'value', { label: 'driftAmplitude', min: 0, max: 3, step: 0.001 })
+            debugPanel.addBinding(thicknessUniform, 'value', { label: 'thickness', min: 0, max: 1, step: 0.001 })
         }
     }
 
@@ -206,9 +238,7 @@ export class Lightnings
         this.explosionParticles = {}
         this.explosionParticles.count = 128
         this.explosionParticles.duration = 4
-
-        // Uniforms
-        const scaleUniform = uniform(0.1)
+        this.explosionParticles.fallAmplitude = 1
         
         // Buffers
         const positionArray = new Float32Array(this.explosionParticles.count * 3)
@@ -218,8 +248,8 @@ export class Lightnings
         {
             const i3 = i * 3
             const spherical = new THREE.Spherical(
-                Math.random() + 2,
-                Math.random() * Math.PI,
+                Math.random(),
+                Math.random() * 0.5 * Math.PI,
                 Math.random() * Math.PI * 2
             )
             const position = new THREE.Vector3().setFromSpherical(spherical)
@@ -235,7 +265,11 @@ export class Lightnings
 
         // Geometry
         this.explosionParticles.geometry = new THREE.PlaneGeometry()
-        this.explosionParticles.geometry.rotateZ(Math.PI * 0.25)
+
+        // Uniforms
+        const scaleUniform = uniform(0.1)
+        const radiusUniform = uniform(3)
+        const easeOutUniform = uniform(8)
 
         // Position node
         this.explosionParticles.positionNode = Fn(([_startTime]) =>
@@ -244,7 +278,7 @@ export class Lightnings
             const timeProgress = min(localTime.div(float(this.explosionParticles.duration).mul(0.75)), 1)
             
             const newPosition = this.explosionParticles.positionAttribute.toVar()
-            newPosition.mulAssign(timeProgress.oneMinus().pow(8).oneMinus())
+            newPosition.mulAssign(timeProgress.oneMinus().pow(easeOutUniform).oneMinus().mul(radiusUniform))
 
             return newPosition
         })
@@ -271,28 +305,54 @@ export class Lightnings
             const mesh = new THREE.Mesh(this.explosionParticles.geometry, material)
             mesh.position.copy(coordinates)
             mesh.count = this.explosionParticles.count
-            mesh.rotation.y = Math.random() * 2
+            mesh.rotation.y = Math.random() * Math.PI * 2
             this.game.scene.add(mesh)
 
-            gsap.to(mesh.position, { y: -1, duration: this.explosionParticles.duration })
+            gsap.to(mesh.position, { y: - this.explosionParticles.fallAmplitude, duration: this.explosionParticles.duration })
             
             return mesh
         }
+
+        if(this.game.debug.active)
+        {
+            const debugPanel = this.debugPanel.addFolder({ title: 'Explosion' })
+            debugPanel.addBinding(this.explosionParticles, 'duration', { min: 0, max: 10, step: 0.01 })
+            debugPanel.addBinding(easeOutUniform, 'value', { label: 'easeOut', min: 1, max: 10, step: 1 })
+            debugPanel.addBinding(scaleUniform, 'value', { label: 'scale', min: 0, max: 1, step: 0.001 })
+            debugPanel.addBinding(radiusUniform, 'value', { label: 'radius', min: 0, max: 10, step: 0.001 })
+            debugPanel.addBinding(this.explosionParticles, 'fallAmplitude', { min: 0, max: 2, step: 0.001 })
+        }
+    }
+
+    createRandom()
+    {
+        const focusPointPosition = this.game.view.focusPoint.position
+        this.create(new THREE.Vector3(
+            focusPointPosition.x + (Math.random() - 0.5) * this.game.view.optimalArea.radius * 2,
+            0,
+            focusPointPosition.z + (Math.random() - 0.5) * this.game.view.optimalArea.radius * 2
+        ))
     }
 
     create(coordinates)
     {
         const disposables = []
         
+        // Anticipation
         disposables.push(this.anticipationParticles.create(coordinates))
 
         gsap.delayedCall(this.anticipationParticles.duration, () =>
         {
+            // Game explosion
             this.game.explosions.explode(coordinates)
             
+            // Arc
             disposables.push(this.arc.create(coordinates))
+
+            // Explosion particles
             disposables.push(this.explosionParticles.create(coordinates))
 
+            // Wait and destroy
             const duration = Math.max(this.arc.duration, this.explosionParticles.duration)
             gsap.delayedCall(duration, () =>
             {
@@ -305,18 +365,40 @@ export class Lightnings
         })
     }
 
+    start()
+    {
+        this.hitChances = Math.random()
+        this.hitChancesTweak.refresh()
+    }
+
+    stop()
+    {
+        this.hitChances = 0
+        this.hitChancesTweak.refresh()
+    }
+
     setInterval()
     {
+        this.game.dayCycles.addIntervalEvent('lightning', 0.4, 0.6)
+        this.game.dayCycles.events.on('lightning', (atNight) =>
+        {
+            if(atNight)
+            {
+                if(Math.random() < this.nightChances) // Chances having ligtnings night
+                    this.start()
+            }
+            else
+            {
+                this.stop()
+            }
+        })
+
         const tryCreate = () =>
         {
-            const focusPointPosition = this.game.view.focusPoint.position
-            this.create(new THREE.Vector3(
-                focusPointPosition.x + (Math.random() - 0.5) * this.game.view.optimalArea.radius * 2,
-                0,
-                focusPointPosition.z + (Math.random() - 0.5) * this.game.view.optimalArea.radius * 2
-            ))
+            if(Math.random() < this.hitChances)
+                this.createRandom()
 
-            gsap.delayedCall(Math.random() * 1, tryCreate)
+            gsap.delayedCall(1, tryCreate)
         }
 
         tryCreate()
