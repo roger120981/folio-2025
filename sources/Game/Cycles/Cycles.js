@@ -11,9 +11,11 @@ export class Cycles
 
         this.name = name
         this.duration = duration
-        this.progress = this.getNewProgress()
+        this.absoluteProgress = (new Date()).getTime() / 1000 / this.duration
+        this.progress = this.absoluteProgress % 1
+        this.progressDelta = 1
         this.manual = false
-        this.manualProgress = this.progress
+        this.manualAbsoluteProgress = this.absoluteProgress
         this.keyframesList = []
         this.properties = []
         this.punctualEvents = []
@@ -28,7 +30,7 @@ export class Cycles
             })
 
             this.debugPanel
-                .addBinding(this, 'manualProgress', { min: 0, max: 1, step: 0.0001 })
+                .addBinding(this, 'manualAbsoluteProgress', { label: 'absoluteProgress', step: 0.01 })
                 .on('change', () => { this.manual = true })
 
             this.game.debug.addButtons(
@@ -117,22 +119,22 @@ export class Cycles
         return keyframes
     }
 
-    getNewProgress()
-    {
-        // New progress
-        let newProgress = 0
-
-        if(this.manual)
-            newProgress = this.manualProgress
-        else
-            newProgress = ((new Date()).getTime() / 1000 / this.duration) % 1
-
-        return newProgress
-    }
-
     update()
     {
-        const newProgress = this.getNewProgress()
+        // New absolute progress
+        let newAbsoluteProgress = 0
+
+        if(this.manual)
+            newAbsoluteProgress = this.manualAbsoluteProgress
+        else
+            newAbsoluteProgress = (new Date()).getTime() / 1000 / this.duration
+
+        this.progressDelta = newAbsoluteProgress - this.absoluteProgress // Delta
+
+        this.absoluteProgress = newAbsoluteProgress
+
+        // New progress
+        const newProgress = this.absoluteProgress % 1
 
         // Test punctual events
         for(const punctualEvent of this.punctualEvents)
@@ -196,13 +198,9 @@ export class Cycles
                 const property = this.properties[key]
 
                 if(property.type === 'color')
-                {
                     property.value.lerpColors(stepPrevious.properties[key], stepNext.properties[key], mixRatio)
-                }
                 else if(property.type === 'number')
-                {
                     property.value = lerp(stepPrevious.properties[key], stepNext.properties[key], mixRatio)
-                }
             }
         }
     }

@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import { color, float, Fn, hash, instancedArray, instanceIndex, materialNormal, max, mod, positionGeometry, rotateUV, sin, smoothstep, step, storage, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
+import { remapClamp } from '../utilities/maths.js'
 
 export class RainSnow
 {
@@ -151,6 +152,11 @@ export class RainSnow
 
     update()
     {
+        // Apply weather
+        this.visibleRatio.value = this.game.weather.rain.value
+        this.weight.value = remapClamp(this.game.weather.temperature.value, 5, -5, 1, 0.1)
+        // TODO: wind
+
         this.mesh.visible = this.visibleRatio.value > 0.00001
         
         if(!this.mesh.visible)

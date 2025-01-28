@@ -5,16 +5,16 @@ export class DayCycles extends Cycles
 {
     constructor()
     {
-        super('🕜 Day Cycles', 60 * 4)
+        super('🕜 Day Cycles', 4 * 60)
     }
 
     getKeyframesDescriptions()
     {
         const presets = {
-            day: { lightColor: new THREE.Color('#ffffff'), lightIntensity: 1.2, shadowColor: new THREE.Color('#0085db'), fogColorA: new THREE.Color('#00ffff'), fogColorB: new THREE.Color('#ffdf89'), fogNearRatio: 0.315, fogFarRatio: 1.25 },
-            dusk: { lightColor: new THREE.Color('#ff4141'), lightIntensity: 1.2, shadowColor: new THREE.Color('#4e009c'), fogColorA: new THREE.Color('#3e53ff'), fogColorB: new THREE.Color('#ff4ce4'), fogNearRatio: 0, fogFarRatio: 1.25 },
-            night: { lightColor: new THREE.Color('#3240ff'), lightIntensity: 3.8, shadowColor: new THREE.Color('#2f00db'), fogColorA: new THREE.Color('#041242'), fogColorB: new THREE.Color('#490a42'), fogNearRatio: -0.225, fogFarRatio: 0.75 },
-            dawn: { lightColor: new THREE.Color('#ff9000'), lightIntensity: 1.2, shadowColor: new THREE.Color('#db004f'), fogColorA: new THREE.Color('#f885ff'), fogColorB: new THREE.Color('#ff7d24'), fogNearRatio: 0, fogFarRatio: 1.25 },
+            day:   { electricField: 0, temperature: 5, lightColor: new THREE.Color('#ffffff'), lightIntensity: 1.2, shadowColor: new THREE.Color('#0085db'), fogColorA: new THREE.Color('#00ffff'), fogColorB: new THREE.Color('#ffdf89'), fogNearRatio: 0.315, fogFarRatio: 1.25 },
+            dusk:  { electricField: 0, temperature: 0, lightColor: new THREE.Color('#ff4141'), lightIntensity: 1.2, shadowColor: new THREE.Color('#4e009c'), fogColorA: new THREE.Color('#3e53ff'), fogColorB: new THREE.Color('#ff4ce4'), fogNearRatio: 0, fogFarRatio: 1.25 },
+            night: { electricField: 1, temperature: -7.5, lightColor: new THREE.Color('#3240ff'), lightIntensity: 3.8, shadowColor: new THREE.Color('#2f00db'), fogColorA: new THREE.Color('#041242'), fogColorB: new THREE.Color('#490a42'), fogNearRatio: -0.225, fogFarRatio: 0.75 },
+            dawn:  { electricField: 0, temperature: 0, lightColor: new THREE.Color('#ff9000'), lightIntensity: 1.2, shadowColor: new THREE.Color('#db004f'), fogColorA: new THREE.Color('#f885ff'), fogColorB: new THREE.Color('#ff7d24'), fogNearRatio: 0, fogFarRatio: 1.25 },
         }
 
         // Debug

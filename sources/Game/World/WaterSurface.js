@@ -1,7 +1,8 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import MeshGridMaterial, { MeshGridMaterialLine } from '../Materials/MeshGridMaterial.js'
-import { color, float, Fn, hash, max, mix, output, positionGeometry, positionLocal, positionWorld, remap, remapClamp, sin, smoothstep, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
+import { color, float, Fn, hash, max, mix, output, positionGeometry, positionLocal, positionWorld, sin, smoothstep, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
+import { remap, remapClamp } from '../utilities/maths.js'
 
 export class WaterSurface
 {
@@ -88,7 +89,7 @@ export class WaterSurface
             const iceVoronoi = texture(
                 this.game.noises.voronoi,
                 positionWorld.xz.mul(iceNoiseFrequency)
-            ).b
+            ).g
 
             const ice = terrainData.b.remapClamp(0, this.iceRatio, 0, 1).step(iceVoronoi)
 
@@ -106,12 +107,12 @@ export class WaterSurface
                 positionWorld.xz.mul(splashesNoiseFrequency.mul(0.25))
             ).r
 
-            const splashDeadArea = float(0.15).step(splashesVoronoi.b)
-            const splashTimeRandom = hash(splashesVoronoi.a.mul(123456))
-            const splashVisibilityRandom = hash(splashesVoronoi.a.mul(654321))
+            const splashDeadArea = float(0.15).step(splashesVoronoi.g)
+            const splashTimeRandom = hash(splashesVoronoi.b.mul(123456))
+            const splashVisibilityRandom = hash(splashesVoronoi.b.mul(654321))
             const visible = splashVisibilityRandom.add(splashPerlin).mod(1).step(this.splashesRatio)
-            const splashProgress = splashesVoronoi.g.sub(this.localTime.mul(splashesTimeFrequency)).add(splashTimeRandom).add(splashPerlin).mod(1).mul(splashesVoronoi.b.remapClamp(0, 1, splashesEdgeAttenuationLow, splashesEdgeAttenuationHigh))
-            const splashes = step(splashesVoronoi.g.remap(0, 1, splashesThickness.oneMinus(), 1), splashProgress).mul(splashDeadArea).mul(visible)
+            const splashProgress = splashesVoronoi.r.sub(this.localTime.mul(splashesTimeFrequency)).add(splashTimeRandom).add(splashPerlin).mod(1).mul(splashesVoronoi.g.remapClamp(0, 1, splashesEdgeAttenuationLow, splashesEdgeAttenuationHigh))
+            const splashes = step(splashesVoronoi.r.remap(0, 1, splashesThickness.oneMinus(), 1), splashProgress).mul(splashDeadArea).mul(visible)
 
             return splashes
         })
@@ -206,6 +207,12 @@ export class WaterSurface
 
     update()
     {
+        // Apply weather
+        this.ripplesRatio.value = remapClamp(this.game.weather.temperature.value, 0, -3, 1, 0)
+        this.iceRatio.value = remapClamp(this.game.weather.temperature.value, 0, -5, 0, 1)
+        this.splashesRatio.value = this.game.weather.rain.value
+        this.timeFrequency = remap(Math.abs(this.game.weather.wind.value), 0, 1, 0.01, 0.1)
+
         this.localTime.value += this.game.ticker.deltaScaled * this.timeFrequency
 
         this.mesh.position.x = this.game.view.optimalArea.position.x
@@ -226,7 +233,6 @@ export class WaterSurface
             this.hasSplashes = hasSplashes
             
             this.setMaterial()
-            console.log('new material')
         }
     }
 }

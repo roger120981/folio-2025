@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import { attribute, cameraNormalMatrix, color, cross, dot, float, Fn, hash, If, materialNormal, min, mix, modelNormalMatrix, modelViewMatrix, PI, positionGeometry, positionLocal, positionWorld, rotateUV, texture, time, uniform, uv, uvec4, varying, vec2, vec3, vec4, viewportSize } from 'three/tsl'
+import { clamp, remapClamp } from '../utilities/maths.js'
 
 export class Snow
 {
@@ -21,7 +22,7 @@ export class Snow
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: '⛇ Snow',
-                expanded: true,
+                expanded: false,
             })
         }
 
@@ -41,13 +42,19 @@ export class Snow
     {
         this.roundedPosition = uniform(vec2(0))
         this.groundDataDelta = uniform(vec2(0))
-        this.elevation = uniform(0.5)
+        this.elevation = uniform(-1)
         this.noiseMultiplier = uniform(1)
         this.noise1Frequency = uniform(0.1)
         this.noise2Frequency = uniform(0.07)
         this.waterDropEdgeLow = uniform(0.185)
         this.waterDropEdgeHigh = uniform(0.235)
         this.waterDropAmplitude = uniform(1)
+
+        // Base elevation
+        const rainRatio = remapClamp(this.game.weather.rain.value, 0.05, 0.3, 0, 1) * remapClamp(this.game.weather.temperature.value, 0, -5, 0, 1)
+        const meltRatio = remapClamp(this.game.weather.temperature.value, 0, 10, 0, -1)
+
+        this.elevation.value = remapClamp(rainRatio + meltRatio, -1, 1, -1, 0.5)
         
         this.elevationNode = Fn(([position]) =>
         {
@@ -377,7 +384,15 @@ export class Snow
 
     update()
     {
-        // Optiml position
+        // Apply weather
+        const rainRatio = remapClamp(this.game.weather.rain.value, 0.05, 0.3, 0, 1) * remapClamp(this.game.weather.temperature.value, 0, -5, 0, 1)
+        const meltRatio = remapClamp(this.game.weather.temperature.value, 0, 10, 0, -1)
+        const elevationStrength = (rainRatio + meltRatio) * this.game.dayCycles.progressDelta * 10
+
+        this.elevation.value += elevationStrength
+        this.elevation.value = clamp(this.elevation.value, -1, 0.5)
+
+        // Optimal position
         this.twinkleProgress.value = 1 + this.game.view.camera.position.x + this.game.view.camera.position.y + this.game.ticker.elapsedScaled * 0.4
         
         // Rounded position

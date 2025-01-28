@@ -11,33 +11,12 @@ export class YearCycles extends Cycles
     getKeyframesDescriptions()
     {
         const presets = {
-            winter: { temperature: 10 },
-            spring: { temperature: 20 },
-            summer: { temperature: 30 },
-            fall: { temperature: 20 },
+            winter: { temperature: 5,  humidity: 0.8, clouds: 0.65, wind: 0.3 },
+            spring: { temperature: 15, humidity: 0.65,  clouds: 0.45, wind: 0.2 },
+            summer: { temperature: 25, humidity: 0.5,  clouds: 0.3,  wind: 0.1 },
+            fall:   { temperature: 15, humidity: 0.65,  clouds: 0.65, wind: 0.25 },
         }
         
-        // Debug
-        if(this.game.debug.active)
-        {
-            for(const presetKey in presets)
-            {
-                // const preset = presets[presetKey]
-                // const presetsDebugPanel = this.debugPanel.addFolder({
-                //     title: presetKey,
-                //     expanded: true,
-                // })
-
-                // this.game.debug.addThreeColorBinding(presetsDebugPanel, preset.lightColor, 'lightColor')
-                // presetsDebugPanel.addBinding(preset, 'lightIntensity', { min: 0, max: 20 })
-                // this.game.debug.addThreeColorBinding(presetsDebugPanel, preset.shadowColor, 'shadowColor')
-                // this.game.debug.addThreeColorBinding(presetsDebugPanel, preset.fogColorA, 'fogColorA')
-                // this.game.debug.addThreeColorBinding(presetsDebugPanel, preset.fogColorB, 'fogColorB')
-                // presetsDebugPanel.addBinding(preset, 'fogNearRatio', { label: 'near', min: -2, max: 2, step: 0.001 })
-                // presetsDebugPanel.addBinding(preset, 'fogFarRatio', { label: 'far', min: -2, max: 2, step: 0.001 })
-            }
-        }
-
         return [
             [
                 { properties: presets.winter, stop: 0 + 0.125 },
