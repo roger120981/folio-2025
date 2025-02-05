@@ -3,7 +3,7 @@ import { Game } from '../Game.js'
 import { color, float, Fn, hash, instancedArray, instanceIndex, materialNormal, max, mod, positionGeometry, rotateUV, sin, smoothstep, step, storage, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
 import { remapClamp } from '../utilities/maths.js'
 
-export class RainSnow
+export class Rain
 {
     constructor()
     {
@@ -15,7 +15,7 @@ export class RainSnow
         if(this.game.debug.active)
         {
             this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🌧️ Rain / Snow',
+                title: '🌧️ Rain',
                 expanded: false,
             })
         }
