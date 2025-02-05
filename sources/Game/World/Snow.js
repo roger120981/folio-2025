@@ -265,18 +265,19 @@ export class Snow
             pivotCenter.x.addAssign(this.roundedPosition.x)
             pivotCenter.z.addAssign(this.roundedPosition.y)
 
-            const pivotA = pivotCenter.add(vec3(- this.subdivisionSize, 0, - this.subdivisionSize)).toVar()
-            const pivotB = pivotCenter.add(vec3(  this.subdivisionSize, 0, - this.subdivisionSize)).toVar()
-            const pivotC = pivotCenter.add(vec3(  this.subdivisionSize, 0,   this.subdivisionSize)).toVar()
-            const pivotD = pivotCenter.add(vec3(- this.subdivisionSize, 0,   this.subdivisionSize)).toVar()
+            const cornerA = pivotCenter.add(vec3(- this.subdivisionSize, 0, - this.subdivisionSize)).toVar()
+            const cornerB = pivotCenter.add(vec3(  this.subdivisionSize, 0, - this.subdivisionSize)).toVar()
+            const cornerC = pivotCenter.add(vec3(  this.subdivisionSize, 0,   this.subdivisionSize)).toVar()
+            const cornerD = pivotCenter.add(vec3(- this.subdivisionSize, 0,   this.subdivisionSize)).toVar()
 
-            pivotA.y.assign(elevationFromTexture(pivotA.xz))
-            pivotB.y.assign(elevationFromTexture(pivotB.xz))
-            pivotC.y.assign(elevationFromTexture(pivotC.xz))
-            pivotD.y.assign(elevationFromTexture(pivotD.xz))
+            pivotCenter.y.assign(elevationFromTexture(pivotCenter.xz))
+            cornerA.y.assign(elevationFromTexture(cornerA.xz).sub(pivotCenter.y))
+            cornerB.y.assign(elevationFromTexture(cornerB.xz).sub(pivotCenter.y))
+            cornerC.y.assign(elevationFromTexture(cornerC.xz).sub(pivotCenter.y))
+            cornerD.y.assign(elevationFromTexture(cornerD.xz).sub(pivotCenter.y))
 
-            const acDelta = pivotA.y.sub(pivotC.y).abs()
-            const bdDelta = pivotB.y.sub(pivotD.y).abs()
+            const acDelta = cornerA.y.sub(cornerC.y).abs()
+            const bdDelta = cornerB.y.sub(cornerD.y).abs()
 
             const rotation = float(0).toVar()
             If(acDelta.lessThan(bdDelta), () =>
