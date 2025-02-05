@@ -90,10 +90,10 @@ export class WaterSurface
 
         this.splashesRatio = uniform(0)
         const splashesNoiseFrequency = uniform(0.33)
-        const splashesTimeFrequency = uniform(4)
-        const splashesThickness = uniform(0.4)
-        const splashesEdgeAttenuationLow = uniform(0.74)
-        const splashesEdgeAttenuationHigh = uniform(0.76)
+        const splashesTimeFrequency = uniform(6)
+        const splashesThickness = uniform(0.3)
+        const splashesEdgeAttenuationLow = uniform(0.14)
+        const splashesEdgeAttenuationHigh = uniform(1)
 
         this.splashesRatioBinding = this.game.debug.addManualBinding(
             this.splashesDebugPanel,
@@ -141,6 +141,7 @@ export class WaterSurface
 
         const splashesNode = Fn(() =>
         {
+            // Noises
             const splashesVoronoi = texture(
                 this.game.noises.voronoi,
                 positionWorld.xz.mul(splashesNoiseFrequency)
@@ -150,14 +151,25 @@ export class WaterSurface
                 positionWorld.xz.mul(splashesNoiseFrequency.mul(0.25))
             ).r
 
-            const splashDeadArea = float(0.15).step(splashesVoronoi.g)
-            const splashTimeRandom = hash(splashesVoronoi.b.mul(123456))
+            // Base
+            const splash = splashesVoronoi.r
+
+            // Time
+            const splashTimeRandom = hash(splashesVoronoi.b.mul(123456)).add(splashPerlin)
+            const splashTime = this.game.wind.localTime.mul(splashesTimeFrequency).add(splashTimeRandom)
+            splash.assign(splash.sub(splashTime).mod(1))
+            
+            // Thickness
+            const edgeMutliplier = splashesVoronoi.g.remapClamp(splashesEdgeAttenuationLow, splashesEdgeAttenuationHigh, 0, 1)
+            const thickness = splashesThickness.mul(edgeMutliplier)
+            splash.assign(thickness.step(splash).oneMinus())
+            
+            // Visibility
             const splashVisibilityRandom = hash(splashesVoronoi.b.mul(654321))
             const visible = splashVisibilityRandom.add(splashPerlin).mod(1).step(this.splashesRatio)
-            const splashProgress = splashesVoronoi.r.sub(this.game.wind.localTime.mul(splashesTimeFrequency)).add(splashTimeRandom).add(splashPerlin).mod(1).mul(splashesVoronoi.g.remapClamp(0, 1, splashesEdgeAttenuationLow, splashesEdgeAttenuationHigh))
-            const splashes = step(splashesVoronoi.r.remap(0, 1, splashesThickness.oneMinus(), 1), splashProgress).mul(splashDeadArea).mul(visible)
-
-            return splashes
+            splash.assign(splash.mul(visible))
+            
+            return splash
         })
 
         this.discardNodeBuilder = () =>
