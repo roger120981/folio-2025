@@ -13,7 +13,7 @@ export class Scenery
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: '🛋️ Scenery',
-                expanded: true,
+                expanded: false,
             })
         }
 
@@ -45,7 +45,7 @@ export class Scenery
         {
             const debugPanel = this.debugPanel.addFolder({
                 title: 'Stone material',
-                expanded: true,
+                expanded: false,
             })
 
             this.game.debug.addThreeColorBinding(debugPanel, stoneColor.value, 'stoneColor')
