@@ -3,7 +3,7 @@ import { color } from 'three/tsl'
 import { Foliage } from './Foliage.js'
 import { Game } from '../Game.js'
 
-export default class Bushes
+export class Bushes
 {
     constructor()
     {
