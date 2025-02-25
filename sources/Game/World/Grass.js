@@ -154,6 +154,7 @@ export class Grass
         const totalShadows = this.game.lighting.addTotalShadowToMaterial(this.material)
 
         let baseColor = this.game.terrainData.colorNode(terrainData)
+        // let baseColor = vec3(0.8)
 
         this.material.normalNode = vec3(0, 1, 0)
         

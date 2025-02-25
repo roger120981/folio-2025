@@ -105,6 +105,7 @@ export class Lighting
             return Fn(([inputColor, totalShadows]) =>
             {
                 const baseColor = inputColor.toVar()
+                // baseColor.assign(vec3(0.8))
 
                 if(withBounce)
                 {

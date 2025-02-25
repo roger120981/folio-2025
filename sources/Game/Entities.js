@@ -50,17 +50,28 @@ export class Entities
             if(typeof _physicalDescription.collidersOverload !== 'undefined')
                 collidersOverload = _physicalDescription.collidersOverload
 
-            colliders.push({
-                shape: 'trimesh',
-                parameters: [ physical.geometry.attributes.position.array, physical.geometry.index.array ],
+            const collider = {
                 position: physical.position,
                 quaternion: physical.quaternion,
                 ...collidersOverload
-            })
+            }
+
+            if(physical.name.startsWith('trimesh'))
+            {
+                collider.shape = 'trimesh'
+                collider.parameters = [ physical.geometry.attributes.position.array, physical.geometry.index.array ]
+            }
+            else if(physical.name.startsWith('cube') || physical.name.startsWith('cuboid'))
+            {
+                collider.shape = 'cuboid'
+                collider.parameters = [ physical.scale.x * 0.5, physical.scale.y * 0.5, physical.scale.z * 0.5 ]
+            }
+
+            colliders.push(collider)
         }
 
         // Add
-        this.add(
+        return this.add(
             {
                 ..._physicalDescription,
                 colliders: colliders

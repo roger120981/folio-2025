@@ -79,16 +79,53 @@ export class Scenery
             {
                 type: 'fixed',
                 friction: 0,
-                // collidersOverload:
-                // {
-                //     category: 'floor'
-                // }
             }
         )
     }
 
     setDynamics()
     {
-        
+        for(const child of this.game.resources.sceneryDynamicModel.scene.children)
+        {
+            const visual = child.children.find(_child => _child.name.startsWith('visual') )
+            const physical = child.children.find(_child => _child.name.startsWith('physical') )
+
+            if(!visual || !physical)
+            {
+                console.warn(`missing visual or physical for dynamic object ${child.name}`)
+            }
+            else
+            {
+                // Materials
+                this.game.materials.updateObject(visual)
+
+                // Shadows
+                visual.traverse(_child =>
+                {
+                    if(_child.isMesh)
+                    {
+                        _child.castShadow = true
+                        _child.receiveShadow = true
+                    }
+                })
+
+                // Entities
+                this.game.entities.addFromModels(
+                    physical,
+                    visual,
+                    {
+                        type: 'dynamic',
+                        friction: child.userData.friction ?? 0.5,
+                        restitution: child.userData.restitution ?? 0.1,
+                        position: child.position,
+                        rotation: child.quaternion,
+                        collidersOverload:
+                        {
+                            mass: (child.userData.mass ?? 1) / physical.children.length
+                        }
+                    }
+                )
+            }
+        }
     }
 }
