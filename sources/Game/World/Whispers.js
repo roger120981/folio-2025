@@ -263,6 +263,21 @@ export class Whispers
         this.modal.inputGroupElement = this.modal.element.querySelector('.js-input-group')
         this.modal.previewMessageElement = this.modal.element.querySelector('.js-preview-message')
 
+        const submit = () =>
+        {
+            // Insert
+            this.game.server.send({
+                type: 'whispersInsert',
+                message: this.modal.inputElement.value,
+                x: this.game.vehicle.position.x,
+                y: this.game.vehicle.position.y,
+                z: this.game.vehicle.position.z
+            })
+
+            // Close modal
+            this.game.modals.close()
+        }
+
         const updateGroup = () =>
         {
             if(this.modal.inputElement.value.length)
@@ -293,21 +308,17 @@ export class Whispers
             updateGroup()
         })
 
+        this.modal.previewMessageElement.addEventListener('keydown', (event) =>
+        {
+            if(event.key === 'Enter')
+                submit()
+        })
+
         this.modal.inputGroupElement.addEventListener('submit', (event) =>
         {
             event.preventDefault()
 
-            // Insert
-            this.game.server.send({
-                type: 'whispersInsert',
-                message: this.modal.inputElement.value,
-                x: this.game.vehicle.position.x,
-                y: this.game.vehicle.position.y,
-                z: this.game.vehicle.position.z
-            })
-
-            // Close modal
-            this.game.modals.close()
+            submit()
         })
 
         modalItem.events.on('closed', () =>
