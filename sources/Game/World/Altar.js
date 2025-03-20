@@ -24,7 +24,7 @@ export class Altar
     setBeam()
     {
         const radius = 2.5
-        const height = 6
+        const height = 4
 
         const colorBottom = uniform(color('#ff544d'))
         const colorTop = uniform(color('#ff1141'))
@@ -40,26 +40,26 @@ export class Altar
         cylinderMaterial.outputNode = Fn(() =>
         {
             const baseUv = uv().toVar()
-            const finalColor = color().toVar()
 
             // Emissive
             const emissiveUv = vec2(baseUv.x.mul(6).add(baseUv.y.mul(-2)), baseUv.y.mul(1).sub(this.game.ticker.elapsedScaledUniform.mul(0.2)))
             const emissiveNoise = texture(this.game.noises.others, emissiveUv).r
-            const emissiveMask = step(baseUv.y.oneMinus().pow(3).oneMinus(), emissiveNoise)
-            
-            finalColor.assign(mix(colorBottom.mul(emissiveBottom), colorTop.mul(emissiveTop), baseUv.y))
+            emissiveNoise.addAssign(baseUv.y)
+            const emissiveMask = step(1, emissiveNoise)
+            const emissiveColor = mix(colorBottom.mul(emissiveBottom), colorTop.mul(emissiveTop), baseUv.y)
 
             // Goo
             const gooColor = this.game.fog.strength.mix(vec3(0), this.game.fog.color) // Fog
-            const gooUv = vec2(baseUv.x.add(baseUv.y.mul(1)).mul(4), baseUv.y.mul(0.5).sub(this.game.ticker.elapsedScaledUniform.mul(0.035)))
-            const gooNoise = texture(this.game.noises.others, gooUv).r
-            const gooMask = step(baseUv.y.oneMinus().pow(2).oneMinus(), gooNoise)
-            finalColor.assign(mix(finalColor, gooColor, gooMask))
+
+            // Mix
+            // const gooMask = step(emissiveNoise, 0.95)
+            const gooMask = step(0.65, emissiveNoise)
+            const finalColor = mix(emissiveColor, gooColor, gooMask)
 
             // Discard
-            max(gooMask, emissiveMask).lessThan(0.5).discard()
+            emissiveMask.greaterThan(0.5).discard()
             
-            return vec4(vec3(finalColor), 1)
+            return vec4(finalColor, 1)
         })()
 
         const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial)
