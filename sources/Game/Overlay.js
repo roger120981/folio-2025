@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from './Game.js'
-import { color, Fn, positionGeometry, uniform, vec4 } from 'three/tsl'
+import { bool, color, float, Fn, If, positionGeometry, texture, uniform, vec2, vec4, viewportBottomLeft, viewportCoordinate } from 'three/tsl'
 import gsap from 'gsap'
 
 export class Overlay
@@ -10,15 +10,45 @@ export class Overlay
         this.game = Game.getInstance()
 
         // Uniforms
-        const baseColor = uniform(color('#110e16'))
-        this.alpha = uniform(0)
+        const baseColor = uniform(color('#2f212d'))
+        this.progress = uniform(0)
+        this.patternSize = uniform(200)
+        this.strokeSize = uniform(10)
+        this.inverted = uniform(0)
 
         // Geometry
         const geometry = new THREE.PlaneGeometry(2, 2)
 
+        // Texture
+        const patternTexture = this.game.resources.overlayPatternTexture
+        patternTexture.wrapS = THREE.RepeatWrapping
+        patternTexture.wrapT = THREE.RepeatWrapping
+
         // Material
         const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false })
-        material.outputNode = vec4(baseColor, this.alpha)
+        material.outputNode = Fn(() =>
+        {
+            // Stroke
+            const strokeMask = viewportCoordinate.x.add(viewportCoordinate.y).div(this.strokeSize).mod(1).sub(0.5).abs()
+
+            // Pattern
+            const patternUv = viewportCoordinate.div(this.patternSize).mod(1)
+            const patternMask = texture(patternTexture, patternUv).a.remap(0, 0.68, 0, 1).toVar()
+
+            If(this.inverted.greaterThan(0.5), () =>
+            {
+                patternMask.assign(patternMask.oneMinus())
+            })
+
+            // Final
+            const mask = patternMask.add(strokeMask.mul(0.4))
+
+            // Discard
+            this.progress.remap(0, 0.8, 0, 1).lessThan(mask).discard()
+            // this.progress.lessThan(mask).discard()
+
+            return vec4(baseColor, 1)
+        })()
         material.vertexNode = vec4(positionGeometry.x, positionGeometry.y, 0, 1)
 
         // Mesh
@@ -32,20 +62,27 @@ export class Overlay
         {
             const debugPanel = this.game.debug.panel.addFolder({
                 title: '⬛️ Overlay',
-                expanded: false,
+                expanded: true,
             })
             this.game.debug.addThreeColorBinding(debugPanel, baseColor.value, 'color')
-            debugPanel.addBinding(this.alpha, 'value', { min: 0, max: 1, step: 0.001 })
+            debugPanel.addBinding(this.progress, 'value', { label: 'progress', min: 0, max: 1, step: 0.001 })
+            debugPanel.addBinding(this.patternSize, 'value', { label: 'patternSize', min: 0, max: 500, step: 1 })
+            debugPanel.addBinding(this.strokeSize, 'value', { label: 'strokeSize', min: 0, max: 50, step: 1 })
+            debugPanel.addBinding(this.inverted, 'value', { label: 'inverted', min: 0, max: 1, step: 1 })
+            debugPanel.addButton({ title: 'show' }).on('click', () => { this.show() })
+            debugPanel.addButton({ title: 'hide' }).on('click', () => { this.hide() })
         }
     }
 
     show()
     {
-        gsap.to(this.alpha, { value: 1, ease: 'power2.out', overwrite: true, duration: 2 })
+        this.inverted.value = 0
+        gsap.to(this.progress, { value: 1, ease: 'power4.out', overwrite: true, duration: 3 })
     }
 
     hide()
     {
-        gsap.to(this.alpha, { value: 0, ease: 'power2.in', overwrite: true, duration: 2 })
+        this.inverted.value = 1
+        gsap.to(this.progress, { value: 0, ease: 'power4.out', overwrite: true, duration: 3 })
     }
 }

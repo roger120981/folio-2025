@@ -20,7 +20,7 @@ export class Tornado
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: '🌪️ Tornado',
-                expanded: true
+                expanded: false
             })
         }
 

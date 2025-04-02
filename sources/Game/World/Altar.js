@@ -13,7 +13,7 @@ export class Altar
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: '💀 Altar',
-                expanded: true,
+                expanded: false,
             })
         }
 
