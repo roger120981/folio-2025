@@ -19,11 +19,6 @@ export class Overlay
         // Geometry
         const geometry = new THREE.PlaneGeometry(2, 2)
 
-        // Texture
-        const patternTexture = this.game.resources.overlayPatternTexture
-        patternTexture.wrapS = THREE.RepeatWrapping
-        patternTexture.wrapT = THREE.RepeatWrapping
-
         // Material
         const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false })
         material.outputNode = Fn(() =>
@@ -33,7 +28,7 @@ export class Overlay
 
             // Pattern
             const patternUv = viewportCoordinate.div(this.patternSize).mod(1)
-            const patternMask = texture(patternTexture, patternUv).a.remap(0, 0.68, 0, 1).toVar()
+            const patternMask = texture(this.game.resources.overlayPatternTexture, patternUv).a.remap(0, 0.68, 0, 1).toVar()
 
             If(this.inverted.greaterThan(0.5), () =>
             {

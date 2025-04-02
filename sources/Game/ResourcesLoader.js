@@ -39,41 +39,56 @@ export class ResourcesLoader
         let toLoad = _files.length
         const loadedResources = {}
 
-        // Success callback
-        const success = (_file, _resource) =>
+        // Progress
+        const progress = () =>
         {
             toLoad--
-            loadedResources[ _file.name ] = _resource
-            this.cache.set(_file.path, _resource)
             
             if(toLoad === 0)
                 _callback(loadedResources)
         }
 
-        // Error callback
+        // Save
+        const save = (_file, _resource) =>
+        {
+            // Apply modifier
+            if(typeof _file[3] !== 'undefined')
+                _file[3](_resource)
+                
+            // Save in resources object
+            loadedResources[_file[0]] = _resource
+
+            // Save in cache
+            this.cache.set(_file[1], _resource)
+        }
+
+        // Error
         const error = (_file) =>
         {
-            console.log(`Resources > Couldn't load file ${_file.path}`)
+            console.log(`Resources > Couldn't load file ${_file[1]}`)
         }
 
         // Each file
         for(const _file of _files)
         {
             // In cache
-            if(this.cache.has(_file.path))
+            if(this.cache.has(_file[1]))
             {
-                success(_file, this.cache.get(_file.path))
+                progress()
             }
 
             // Not in cache
             else
             {
-                const loader = this.getLoader(_file.type)
+                const loader = this.getLoader(_file[2])
                 loader.load(
-                    _file.path,
-                    resource => { success(_file, resource) },
+                    _file[1],
+                    resource => {
+                        save(_file, resource)
+                        progress()
+                    },
                     undefined,
-                    // resource => { error(_file, resource) },
+                    resource => { error(_file, resource) },
                 )
             }
         }
