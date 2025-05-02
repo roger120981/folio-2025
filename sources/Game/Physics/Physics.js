@@ -1,5 +1,5 @@
 import { Game } from '../Game.js'
-import RAPIER from '@dimforge/rapier3d-compat'
+import RAPIER from '@dimforge/rapier3d-simd-compat'
 import { PhysicsWireframe } from './PhysicsWireframe.js'
 import { remapClamp } from '../utilities/maths.js'
 import * as THREE from 'three/webgpu'

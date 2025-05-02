@@ -1,4 +1,4 @@
-import RAPIER from '@dimforge/rapier3d-compat'
+import RAPIER from '@dimforge/rapier3d-simd-compat'
 import * as THREE from 'three/webgpu'
 
 import { Debug } from './Debug.js'
