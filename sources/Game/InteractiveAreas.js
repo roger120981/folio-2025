@@ -85,7 +85,7 @@ export class InteractiveAreas
         group.rotation.y = Math.PI * 0.25
         group.position.copy(newPosition)
         group.scale.setScalar(0.85)
-        this.game.scene.add(group)
+        // this.game.scene.add(group)
 
         /**
          * Diamond
