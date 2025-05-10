@@ -38,9 +38,10 @@ export class Scenery
         this.flowers = new Flowers()
         this.bricks = new Bricks()
 
-        if(this.references.projectsCarpet)
+        if(this.references.projectsCarpet && this.references.projectsInteractiveArea)
             this.projects = new Projects(
-                this.references.projectsCarpet[0]
+                this.references.projectsCarpet[0],
+                this.references.projectsInteractiveArea[0].position,
             )
 
         if(this.references.altar && this.references.altarCounter && this.references.altarSkullEyes)

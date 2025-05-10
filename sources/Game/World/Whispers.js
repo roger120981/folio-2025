@@ -328,7 +328,7 @@ export class Whispers
             this.modal.previewMessageText.textContent = 'Your message here'
             this.modal.input.value = ''
             updateGroup()
-            closeFlagSelect()
+            this.modal.closeFlagSelect()
         })
 
         // Server connect / disconnect
@@ -390,7 +390,7 @@ export class Whispers
                 localStorage.removeItem('countryCode')
             }
 
-            closeFlagSelect()
+            this.modal.closeFlagSelect()
         }
 
         // Remove
@@ -491,7 +491,6 @@ export class Whispers
             this.modal.flagsSelectOpen = true
             this.modal.flagSelect.classList.add('is-visible')
             this.modal.flagSearch.focus()
-            this.game.modals.preventInputClose = true
         }
 
         this.modal.flagButton.addEventListener('click', (event) =>
@@ -501,25 +500,16 @@ export class Whispers
         })
 
         // Close
-        const closeFlagSelect = () =>
+        this.modal.closeFlagSelect = () =>
         {
             this.modal.flagsSelectOpen = false
             this.modal.flagSelect.classList.remove('is-visible')
-            this.game.modals.preventInputClose = false
         }
 
         this.modal.flagClose.addEventListener('click', (event) =>
         {
             event.preventDefault()
-            closeFlagSelect()
-        })
-
-        this.game.inputs.events.on('close', (event) =>
-        {
-            if(this.modal.flagsSelectOpen && event.down)
-            {
-                closeFlagSelect()
-            }
+            this.modal.closeFlagSelect()
         })
 
         // From localstorage

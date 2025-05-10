@@ -16,7 +16,6 @@ export class Modals
         this.current = null
         this.pending = null
         this.default = null
-        this.preventInputClose = false
 
         this.setClose()
         this.setItems()
@@ -26,10 +25,6 @@ export class Modals
         {
             this.onTransitionEnded()
         })
-
-        this.game.inputs.addMap([
-            { name: 'close', categories: [ 'ui', 'playing' ], keys: [ 'Escape' ] },
-        ])
     }
 
     onTransitionEnded()
@@ -96,26 +91,20 @@ export class Modals
                 this.close()
             })
         }
+    }
 
-        this.game.inputs.events.on('close', (event) =>
+    toggle()
+    {
+        if(this.state === Modals.OPENED || this.state === Modals.OPENING)
         {
-            if(this.preventInputClose)
-                return
-
-            if(event.down)
-            {
-                if(this.state === Modals.OPENED || this.state === Modals.OPENING)
-                {
-                    this.pending = null
-                    this.close()
-                }
-                else if(this.state === Modals.CLOSED || this.state === Modals.CLOSING)
-                {
-                    if(this.default)
-                        this.open(this.default.name)
-                }
-            }
-        })
+            this.pending = null
+            this.close()
+        }
+        else if(this.state === Modals.CLOSED || this.state === Modals.CLOSING)
+        {
+            if(this.default)
+                this.open(this.default.name)
+        }
     }
 
     open(name)
@@ -159,7 +148,7 @@ export class Modals
 
             this.state = Modals.OPENING
             this.current = item
-            this.game.inputs.updateFilters(['ui'])
+            this.game.inputs.updateFilters(['modal'])
 
             item.events.trigger('open')
         }

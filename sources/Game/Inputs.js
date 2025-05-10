@@ -30,7 +30,7 @@ export class Inputs
         addEventListener('wheel', (_event) =>
         {
             // TODO: Prevent hard coding of zoom filter
-            if(this.filters.indexOf('ui') !== -1)
+            if(this.filters.indexOf('modal') !== -1)
                 return
 
             const normalized = normalizeWheel(_event)
