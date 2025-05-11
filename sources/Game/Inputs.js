@@ -30,7 +30,7 @@ export class Inputs
         addEventListener('wheel', (_event) =>
         {
             // TODO: Prevent hard coding of zoom filter
-            if(this.filters.indexOf('modal') !== -1)
+            if(this.filters.indexOf('ui') !== -1)
                 return
 
             const normalized = normalizeWheel(_event)
@@ -94,7 +94,7 @@ export class Inputs
 
         // Has filter but no category on map => Forbid
         if(map.categories.length === 0)
-            return false
+            return true
 
         // Has matching category and filter => All
         for(const category of map.categories)

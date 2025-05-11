@@ -3,6 +3,7 @@ import CameraControls from 'camera-controls'
 import { Game } from './Game.js'
 import { clamp, lerp, smoothstep } from './utilities/maths.js'
 import { mix, uniform, vec4, Fn, positionGeometry, attribute } from 'three/tsl'
+import gsap from 'gsap'
 
 CameraControls.install( { THREE: THREE } )
 
@@ -48,6 +49,7 @@ export class View
         this.setCameras()
         this.setOptimalArea()
         this.setFree()
+        this.setCinematic()
         this.setSpeedLines()
 
         this.game.ticker.events.on('tick', () =>
@@ -116,7 +118,9 @@ export class View
     setOptimalArea()
     {
         this.optimalArea = {}
+        this.optimalArea.needsUpdate = true
         this.optimalArea.position = new THREE.Vector3()
+        this.optimalArea.basePosition = new THREE.Vector3()
         this.optimalArea.nearPosition = new THREE.Vector3()
         this.optimalArea.farPosition = new THREE.Vector3()
         this.optimalArea.nearDistance = null
@@ -143,6 +147,13 @@ export class View
 
         this.optimalArea.update = () =>
         {
+            // Save state
+            const savedPosition = this.defaultCamera.position.clone()
+            const savedQuaternion = this.defaultCamera.quaternion.clone()
+
+            // Reset
+            this.defaultCamera.position.set(0, 0, 0).add(this.spherical.offset)
+            this.defaultCamera.lookAt(new THREE.Vector3())
             this.defaultCamera.updateProjectionMatrix()
 
             // First near/far diagonal
@@ -167,12 +178,12 @@ export class View
 
             const centerB = this.optimalArea.nearPosition.clone().lerp(this.optimalArea.farPosition, 0.5)
 
-            // Center between the two fiagonal centers
-            this.optimalArea.position = centerA.clone().lerp(centerB, 0.5)
-            this.optimalArea.helpers.center.position.copy(this.optimalArea.position)
+            // Center between the two diagonal centers
+            this.optimalArea.basePosition = centerA.clone().lerp(centerB, 0.5)
+            this.optimalArea.helpers.center.position.copy(this.optimalArea.basePosition)
 
             // Radius
-            const optimalRadius = this.optimalArea.position.distanceTo(this.optimalArea.farPosition)
+            const optimalRadius = this.optimalArea.basePosition.distanceTo(this.optimalArea.farPosition)
 
             if(optimalRadius > this.optimalArea.radius)
                 this.optimalArea.radius = optimalRadius
@@ -189,6 +200,13 @@ export class View
                 this.optimalArea.nearDistance = this.camera.position.distanceTo(this.optimalArea.nearPosition)
                 this.optimalArea.farDistance = this.camera.position.distanceTo(this.optimalArea.farPosition)
             }
+
+            // Put back state
+            this.defaultCamera.position.copy(savedPosition)
+            this.defaultCamera.quaternion.copy(savedQuaternion)
+
+            // Save
+            this.optimalArea.needsUpdate = false
         }
     }
 
@@ -297,6 +315,28 @@ export class View
         this.freeMode.smoothTime = 0.075
         this.freeMode.draggingSmoothTime = 0.075
         this.freeMode.dollySpeed = 0.2
+    }
+
+    setCinematic()
+    {
+        this.cinematic = {}
+        this.cinematic.progress = 0
+        this.cinematic.position = new THREE.Vector3()
+        this.cinematic.target = new THREE.Vector3()
+        this.cinematic.dummy = this.camera.clone()
+
+        this.cinematic.start = (position, target) =>
+        {
+            this.cinematic.position = position
+            this.cinematic.target = target
+            
+            gsap.to(this.cinematic, { progress: 1, duration: 2, ease: 'power2.inOut', overwrite: true })
+        }
+
+        this.cinematic.end = () =>
+        {
+            gsap.to(this.cinematic, { progress: 0, duration: 1.5, ease: 'power2.inOut', overwrite: true })
+        }
     }
 
     setSpeedLines()
@@ -478,6 +518,15 @@ export class View
         this.roll.speed *= 1 - this.roll.damping * this.game.ticker.deltaScaled
         this.defaultCamera.rotation.z += this.roll.value
 
+        // Cinematic
+        if(this.cinematic.progress > 0)
+        {
+            this.cinematic.dummy.position.copy(this.cinematic.position)
+            this.cinematic.dummy.lookAt(this.cinematic.target)
+            this.defaultCamera.position.lerp(this.cinematic.dummy.position, this.cinematic.progress)
+            this.defaultCamera.quaternion.slerp(this.cinematic.dummy.quaternion, this.cinematic.progress)
+        }
+
         // Apply to final camera
         if(this.mode === View.DEFAULT_MODE)
         {
@@ -497,7 +546,9 @@ export class View
         this.freeCamera.updateMatrixWorld()
         
         // Optimal area
-        this.optimalArea.update()
+        if(this.optimalArea.needsUpdate)
+            this.optimalArea.update()
+        this.optimalArea.position.copy(this.optimalArea.basePosition).add(new THREE.Vector3(this.focusPoint.position.x, 0, this.focusPoint.position.z))
 
         // Speed lines
         this.speedLines.clipSpaceTarget.value.copy(this.speedLines.worldTarget)

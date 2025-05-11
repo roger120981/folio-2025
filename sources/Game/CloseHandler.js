@@ -7,7 +7,7 @@ export class CloseHandler
         this.game = Game.getInstance()
 
         this.game.inputs.addMap([
-            { name: 'close', categories: [ 'modal', 'focus', 'playing' ], keys: [ 'Escape' ] },
+            { name: 'close', categories: [ 'modal', 'cinematic', 'playing' ], keys: [ 'Escape' ] },
         ])
         this.game.inputs.events.on('close', (event) =>
         {
