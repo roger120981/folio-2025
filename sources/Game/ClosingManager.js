@@ -1,7 +1,7 @@
 import { Game } from './Game.js'
 import { Projects } from './World/Projects.js'
 
-export class CloseHandler
+export class ClosingManager
 {
     constructor()
     {

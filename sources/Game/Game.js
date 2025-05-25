@@ -35,7 +35,7 @@ import { Tornado } from './Tornado.js'
 import { InteractiveAreas } from './InteractiveAreas.js'
 import { Respawns } from './Respawns.js'
 import { Audio } from './Audio.js'
-import { CloseHandler } from './CloseHandler.js'
+import { ClosingManager } from './ClosingManager.js'
 import { Cursor } from './Cursor.js'
 
 export class Game
@@ -159,7 +159,7 @@ export class Game
             this.interactiveAreas = new InteractiveAreas()
             this.world = new World()
             this.overlay = new Overlay()
-            this.closeHandler = new CloseHandler()
+            this.closingManager = new ClosingManager()
             // this.monitoring = new Monitoring()
 
             this.rendering.renderer.setAnimationLoop((elapsedTime) => { this.ticker.update(elapsedTime) })
