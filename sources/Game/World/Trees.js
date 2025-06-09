@@ -13,7 +13,7 @@ export class Trees
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: `🌳 ${name}`,
-                expanded: true,
+                expanded: false,
             })
         }
 

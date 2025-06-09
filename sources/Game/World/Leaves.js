@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { float, Fn, hash, instancedArray, instanceIndex, materialNormal, max, mod, modelViewMatrix, normalWorld, positionGeometry, remapClamp, rotateUV, sin, smoothstep, step, storage, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
+import { float, Fn, hash, instancedArray, instanceIndex, materialNormal, max, mod, modelViewMatrix, normalWorld, positionGeometry, remapClamp, rotateUV, sin, smoothstep, step, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
 import { remap } from '../utilities/maths.js'
 import gsap from 'gsap'
 
@@ -10,8 +10,8 @@ export class Leaves
     {
         this.game = Game.getInstance()
 
-        if(this.game.yearCycles.properties.leaves.value < 0.25)
-            return
+        // if(this.game.yearCycles.properties.leaves.value < 0.25)
+        //     return
 
         const power = Math.round(remap((this.game.yearCycles.properties.leaves.value), 0.25, 1, 7, 12))
         this.count = Math.pow(2, power)
@@ -80,19 +80,19 @@ export class Leaves
         const baseRotationArray = new Float32Array(this.count)
         for(let i = 0; i < this.count; i++)
             baseRotationArray[i] = Math.random() * Math.PI * 2
-        const baseRotationBuffer = storage(new THREE.StorageInstancedBufferAttribute(baseRotationArray, 1), 'float', this.count).toAttribute()
+        const baseRotationBuffer = instancedArray(baseRotationArray, 'float').toAttribute()
         
         // Scale
         const scaleArray = new Float32Array(this.count)
         for(let i = 0; i < this.count; i++)
             scaleArray[i] = Math.random() * 0.5 + 0.5
-        const scaleBuffer = storage(new THREE.StorageInstancedBufferAttribute(scaleArray, 1), 'float', this.count).toAttribute()
+        const scaleBuffer = instancedArray(scaleArray, 'float').toAttribute()
         
         // Weight
         const weightArray = new Float32Array(this.count)
         for(let i = 0; i < this.count; i++)
             weightArray[i] = Math.random() * 0.5 + 0.5
-        const weightBuffer = storage(new THREE.StorageInstancedBufferAttribute(weightArray, 1), 'float', this.count)
+        const weightBuffer = instancedArray(weightArray, 'float')
 
         // Color buffer
         const colorArray = new Float32Array(this.count * 3)
@@ -103,7 +103,7 @@ export class Leaves
             const color = colorA.clone().lerp(colorB, Math.random())
             color.toArray(colorArray, i * 3)
         }
-        const colorBuffer = storage(new THREE.StorageInstancedBufferAttribute(colorArray, 3), 'vec3', this.count).toAttribute()
+        const colorBuffer = instancedArray(colorArray, 'vec3').toAttribute()
 
         // Normal buffer
         const normalArray = new Float32Array(this.count * 3)
@@ -114,7 +114,7 @@ export class Leaves
             normal.applyAxisAngle(new THREE.Vector3(0, 0, 1), (Math.random() - 0.5) * 2)
             normal.toArray(normalArray, i * 3)
         }
-        const normalBuffer = storage(new THREE.StorageInstancedBufferAttribute(normalArray, 3), 'vec3', this.count).toAttribute()
+        const normalBuffer = instancedArray(normalArray, 'vec3').toAttribute()
 
         // Output color
         this.material.outputNode = this.game.lighting.lightOutputNodeBuilder(colorBuffer, float(1), normalWorld, this.game.lighting.addTotalShadowToMaterial(this.material))

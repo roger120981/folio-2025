@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { color, float, Fn, mix, normalWorld, positionGeometry, step, storage, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
+import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import { InteractiveAreas } from '../InteractiveAreas.js'
 
 export class Bonfire
@@ -47,8 +47,8 @@ export class Bonfire
             scales[i] = 0.02 + Math.random() * 0.06
         }
         
-        const positionAttribute = storage(new THREE.StorageInstancedBufferAttribute(positions, 3), 'vec3', count).toAttribute()
-        const scaleAttribute = storage(new THREE.StorageInstancedBufferAttribute(scales, 1), 'float', count).toAttribute()
+        const positionAttribute = instancedArray(positions, 'vec3').toAttribute()
+        const scaleAttribute = instancedArray(scales, 'float').toAttribute()
 
         const material = new THREE.SpriteNodeMaterial()
         material.colorNode = emissiveMaterial.colorNode

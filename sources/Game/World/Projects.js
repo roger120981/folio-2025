@@ -24,7 +24,7 @@ export class Projects
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: '📚 Projects',
-                expanded: true,
+                expanded: false,
             })
         }
         

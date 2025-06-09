@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { hash, instanceIndex, sin, storage, uniform, vec3 } from 'three/tsl'
+import { hash, instancedArray, instanceIndex, sin, uniform, vec3 } from 'three/tsl'
 import gsap from 'gsap'
 
 export class PoleLights
@@ -56,7 +56,7 @@ export class PoleLights
             }
         }
         
-        const positionAttribute = storage(new THREE.StorageInstancedBufferAttribute(positions, 3), 'vec3', count).toAttribute()
+        const positionAttribute = instancedArray(positions, 'vec3').toAttribute()
 
         const material = new THREE.SpriteNodeMaterial()
         material.colorNode = this.emissive.onMaterial.colorNode

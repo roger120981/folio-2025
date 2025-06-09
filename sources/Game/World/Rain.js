@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { color, float, Fn, hash, instancedArray, instanceIndex, max, mod, normalWorld, positionGeometry, rotateUV, sin, smoothstep, step, storage, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
+import { color, float, Fn, hash, instancedArray, instanceIndex, max, mod, normalWorld, positionGeometry, rotateUV, sin, smoothstep, step, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
 import { remapClamp } from '../utilities/maths.js'
 
 export class Rain
@@ -60,7 +60,7 @@ export class Rain
         const scaleArray = new Float32Array(this.count)
         for(let i = 0; i < this.count; i++)
             scaleArray[i] = Math.random() * 0.5 + 0.5
-        const scaleBuffer = storage(new THREE.StorageInstancedBufferAttribute(scaleArray, 1), 'float', this.count).toAttribute()
+        const scaleBuffer = instancedArray(scaleArray, 'float').toAttribute()
         
         // Output color
         this.material.outputNode = this.game.lighting.lightOutputNodeBuilder(color('#ffffff'), float(1), vec3(1, 1, 1), this.game.lighting.addTotalShadowToMaterial(this.material))
