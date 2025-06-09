@@ -16,6 +16,7 @@ export class VisualVehicle
         this.setBlinkers()
         this.setAntenna()
         this.setBoostTrails()
+        this.setScreenPosition()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -186,6 +187,11 @@ export class VisualVehicle
         this.boostTrails.rightReference.getWorldPosition(this.boostTrails.right.position)
     }
 
+    setScreenPosition()
+    {
+        this.screenPosition = new THREE.Vector2(0, 0)
+    }
+
     update()
     {
         const physicalVehicle = this.game.physicalVehicle
@@ -265,5 +271,13 @@ export class VisualVehicle
         this.boostTrails.left.alpha = trailAlpha
         this.boostTrails.rightReference.getWorldPosition(this.boostTrails.right.position)
         this.boostTrails.right.alpha = trailAlpha
+
+        // Screen position
+        const vector = new THREE.Vector3()
+        vector.setFromMatrixPosition(this.parts.chassis.matrixWorld)
+        vector.project(this.game.view.camera)
+
+        this.screenPosition.x = (vector.x * 0.5 + 0.5)
+        this.screenPosition.y = (vector.y * -0.5 + 0.5)
     }
 }

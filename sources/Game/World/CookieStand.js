@@ -293,7 +293,7 @@ export class CookieStand
             this.counter.initialised = true
 
             // Format value
-            const formatedValue = this.counter.value.toLocaleString("en-US")
+            const formatedValue = this.counter.value.toLocaleString('en-US')
             
             // Texture
             const textSize = context.measureText(`${formatedValue}00`)

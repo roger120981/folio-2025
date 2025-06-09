@@ -20,7 +20,7 @@ export class Bushes
                 expanded: false,
             })
             this.game.debug.addThreeColorBinding(debugPanel, this.color, 'color')
-            debugPanel.addBinding(this.foliage.shadowOffset, 'value', { label: 'shadowOffset', min: 0, max: 2, step: 0.001 })
+            debugPanel.addBinding(this.foliage.material.shadowOffset, 'value', { label: 'shadowOffset', min: 0, max: 2, step: 0.001 })
         }
     }
 }

@@ -1,22 +1,28 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { color, uniform, mix, output, instance, smoothstep, vec4, PI, vertexIndex, rotateUV, sin, uv, texture, float, Fn, positionLocal, vec3, transformNormalToView, normalWorld, positionWorld, frontFacing, If } from 'three/tsl'
+import { color, uniform, mix, output, instance, smoothstep, min, vec4, PI, vertexIndex, rotateUV, sin, uv, texture, float, Fn, positionLocal, vec3, transformNormalToView, normalWorld, positionWorld, frontFacing, If, screenUV, vec2, viewportResolution, screenSize, instanceIndex, varying, range } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { remap } from '../utilities/maths.js'
 
 export class Foliage
 {
-    constructor(references, color)
+    constructor(references, color, xRay = false)
     {
         this.game = Game.getInstance()
 
         this.references = references
         this.color = color
+        this.xRay = xRay
 
         this.setGeometry()
         this.setMaterial()
         this.setFromReferences()
         this.setInstancedMesh()
+
+        this.game.ticker.events.on('tick', () =>
+        {
+            this.update()
+        }, 7)
     }
 
     setGeometry()
@@ -76,16 +82,14 @@ export class Foliage
 
     setMaterial()
     {
-        this.material = new THREE.MeshLambertNodeMaterial({
-            alphaMap: this.game.resources.foliateTexture,
-            alphaTest: 0.01
-        })
+        this.material = {}
+        this.material.instance = new THREE.MeshLambertNodeMaterial()
     
         // Position
         const wind = this.game.wind.offsetNode([positionLocal.xz])
         const multiplier = positionLocal.y.clamp(0, 1).mul(1)
 
-        this.material.positionNode = Fn( ( { object } ) =>
+        this.material.instance.positionNode = Fn( ( { object } ) =>
         {
             // Sending "instanceMatrix" twice because mandatory 3 parameters
             // TODO: Update after Three.js fix
@@ -95,16 +99,71 @@ export class Foliage
         })()
 
         // Received shadow position
-        this.shadowOffset = uniform(1)
-        this.material.shadowPositionNode = positionLocal.add(this.game.lighting.directionUniform.mul(this.shadowOffset))
+        this.material.shadowOffset = uniform(1)
+        this.material.instance.shadowPositionNode = positionLocal.add(this.game.lighting.directionUniform.mul(this.material.shadowOffset))
 
         // Shadow receive
-        const totalShadows = this.game.lighting.addTotalShadowToMaterial(this.material)
+        const totalShadows = this.game.lighting.addTotalShadowToMaterial(this.material.instance)
 
         // Output
         const uniformColor = uniform(this.color)
+        this.material.threshold = uniform(0.3)
 
-        this.material.outputNode = this.game.lighting.lightOutputNodeBuilder(uniformColor, float(1), normalWorld, totalShadows)
+        this.material.xRayPosition = uniform(vec2())
+        this.material.xRayEdgeMin = uniform(0.25)
+        this.material.xRayEdgeMax = uniform(0.5)
+        this.material.xRayTresholdAmplitude = uniform(0.7)
+        this.material.xRayNoiseFrequency = uniform(0.335)
+        this.material.xRayNoiseStrength = uniform(0.5)
+
+        this.material.instance.outputNode = Fn(() =>
+        {
+            // XRay around the vehicle
+            if(this.xRay)
+            {
+                const toVehicle = screenUV.sub(this.material.xRayPosition).toVar()
+                toVehicle.mulAssign(vec2(screenSize.x.div(screenSize.y), 1))
+                const distanceToVehicle = toVehicle.length()
+                
+                // Apply noise to add variations
+                const noiseUv = screenUV.toVar()
+                noiseUv.x.mulAssign(screenSize.x.div(screenSize.y))
+                noiseUv.addAssign(vec2(range(0, 100).mul(0.1)))
+                const noise = texture(this.game.noises.others, noiseUv.mul(this.material.xRayNoiseFrequency)).r
+
+                distanceToVehicle.addAssign(noise.sub(0.5).mul(this.material.xRayNoiseStrength))
+
+                // Visibility threshold
+                const visibilityThreshold = distanceToVehicle.remapClamp(
+                    this.material.xRayEdgeMin,
+                    this.material.xRayEdgeMax,
+                    this.material.threshold.add(this.material.xRayTresholdAmplitude),
+                    this.material.threshold
+                ).toVar()
+
+                // Foliage texture
+                const visibility = texture(this.game.resources.foliateTexture).r
+
+                // Discard
+                visibility.lessThan(visibilityThreshold).discard()
+            }
+            else
+            {
+                // Discard
+                const visibility = texture(this.game.resources.foliateTexture).r
+                visibility.lessThan(this.material.threshold).discard()
+            }
+
+            // Lighting
+            return this.game.lighting.lightOutputNodeBuilder(uniformColor, float(1), normalWorld, totalShadows)
+        })()
+
+        this.material.instance.castShadowNode = Fn(() =>
+        {
+            const alphaColor = texture(this.game.resources.foliateTexture).r
+            alphaColor.lessThan(0.5).discard()
+            return vec4(0.0)
+        })()
     }
 
     setFromReferences()
@@ -134,7 +193,7 @@ export class Foliage
     
     setInstancedMesh()
     {
-        this.mesh = new THREE.Mesh(this.geometry, this.material)
+        this.mesh = new THREE.Mesh(this.geometry, this.material.instance)
         this.mesh.receiveShadow = true
         this.mesh.castShadow = true
         this.mesh.count = this.transformMatrices.length
@@ -150,5 +209,10 @@ export class Foliage
             _item.toArray(this.instanceMatrix.array, i * 16)
             i++
         }
+    }
+
+    update()
+    {
+        this.material.xRayPosition.value.copy(this.game.world.visualVehicle.screenPosition)
     }
 }

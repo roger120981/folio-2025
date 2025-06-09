@@ -13,7 +13,7 @@ export class Trees
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: `🌳 ${name}`,
-                expanded: false,
+                expanded: true,
             })
         }
 
@@ -80,13 +80,19 @@ export class Trees
         }
 
         this.leavesColor = new THREE.Color(this.color)
-        this.leaves = new Foliage(references, this.leavesColor)
+        this.leaves = new Foliage(references, this.leavesColor, true)
 
         // Debug
         if(this.game.debug.active)
         {
             this.game.debug.addThreeColorBinding(this.debugPanel, this.leavesColor, 'leavesColor')
-            this.debugPanel.addBinding(this.leaves.shadowOffset, 'value', { label: 'shadowOffset', min: 0, max: 2, step: 0.001 })
+            this.debugPanel.addBinding(this.leaves.material.shadowOffset, 'value', { label: 'shadowOffset', min: 0, max: 2, step: 0.001 })
+            this.debugPanel.addBinding(this.leaves.material.threshold, 'value', { label: 'threshold', min: 0, max: 1, step: 0.001 })
+            this.debugPanel.addBinding(this.leaves.material.xRayEdgeMin, 'value', { label: 'xRayEdgeMin', min: 0, max: 1, step: 0.001 })
+            this.debugPanel.addBinding(this.leaves.material.xRayEdgeMax, 'value', { label: 'xRayEdgeMax', min: 0, max: 1, step: 0.001 })
+            this.debugPanel.addBinding(this.leaves.material.xRayTresholdAmplitude, 'value', { label: 'xRayTresholdAmplitude', min: 0, max: 1, step: 0.001 })
+            this.debugPanel.addBinding(this.leaves.material.xRayNoiseFrequency, 'value', { label: 'xRayNoiseFrequency', min: 0, max: 1, step: 0.001 })
+            this.debugPanel.addBinding(this.leaves.material.xRayNoiseStrength, 'value', { label: 'xRayNoiseStrength', min: 0, max: 1, step: 0.001 })
         }
     }
 

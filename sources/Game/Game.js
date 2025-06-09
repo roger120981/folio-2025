@@ -64,7 +64,7 @@ export class Game
             this.resourcesLoader = new ResourcesLoader()
             this.resourcesLoader.load(
                 [
-                    [ 'foliateTexture',                 'foliage/foliage.png',                          'texture' ],
+                    [ 'foliateTexture',                 'foliage/foliageSDF.png',                       'texture' ],
                     [ 'bushesReferences',               'bushes/bushesReferences.glb',                  'gltf'    ],
                     [ 'vehicle',                        'vehicle/default.glb',                          'gltf'    ],
                     // [ 'vehicle',                        'vehicle/defaultAntenna.glb',                   'gltf'    ],
