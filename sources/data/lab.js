@@ -17,7 +17,7 @@ export default [
         title: 'Holographic terrain',
         titleSmall: [ 'Holographic', 'terrain' ],
         url: 'https://experiment-holographic-terrain.vercel.app',
-        image: 'bonhomme0-ans.webp',
+        image: 'bonhomme-10-ans.webp',
         imageMini: 'bonhomme0-ans-mini.webp'
     },
     {

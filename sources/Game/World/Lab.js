@@ -39,7 +39,7 @@ export class Lab
         this.setHover()
         this.setProjects()
         this.setImages()
-        // this.setAdjacents()
+        this.setAdjacents()
         this.setTitle()
         this.setUrl()
         this.setScroller()
@@ -57,6 +57,11 @@ export class Lab
             this.debugPanel.addButton({ title: 'open', label: 'open' }).on('click', () => { this.open() })
             this.debugPanel.addButton({ title: 'close', label: 'close' }).on('click', () => { this.close() })
         }
+
+        this.game.ticker.events.on('tick', () =>
+        {
+            this.update()
+        })
     }
 
     setInteractiveArea()
@@ -429,39 +434,20 @@ export class Lab
     setAdjacents()
     {
         this.adjacents = {}
-        this.adjacents.status = 'hidden'
 
         /**
          * Previous
          */
-        this.adjacents.previous = {}
-        this.adjacents.previous.group = this.references.get('previous')[0]
-        this.adjacents.previous.inner = this.adjacents.previous.group.children[0]
-
-        // Text
-        this.adjacents.previous.textMesh = this.adjacents.previous.inner.children.find(_child => _child.name.startsWith('text'))
-        this.adjacents.previous.textCanvas = new TextCanvas(
-            this.texts.fontFamily,
-            this.texts.fontWeight,
-            this.texts.fontSizeMultiplier * 0.3,
-            1.25,
-            0.75,
-            this.texts.density,
-            'center',
-            0.3
-        )
-        this.texts.createMaterialOnMesh(this.adjacents.previous.textMesh, this.adjacents.previous.textCanvas.texture)
-
         // Arrow
-        const arrowPrevious = this.references.get('arrowPreviousProject')[0]
+        const arrowPrevious = this.references.get('arrowPrevious')[0]
         arrowPrevious.material = this.hover.inactiveMaterial
         
         // Intersect
-        const intersectPrevious = this.references.get('intersectPreviousProject')[0]
+        const intersectPrevious = this.references.get('intersectPrevious')[0]
         const intersectPreviousPosition = new THREE.Vector3()
         intersectPrevious.getWorldPosition(intersectPreviousPosition)
 
-        this.adjacents.previous.intersect = this.game.cursor.addIntersects({
+        this.adjacents.previousIntersect = this.game.cursor.addIntersects({
             active: false,
             shapes:
             [
@@ -469,7 +455,7 @@ export class Lab
             ],
             onClick: () =>
             {
-                this.previousProject(true)
+                this.previous(true)
             },
             onEnter: () =>
             {
@@ -484,35 +470,17 @@ export class Lab
         /**
          * Next
          */
-        this.adjacents.next = {}
-        this.adjacents.next.group = this.references.get('next')[0]
-        this.adjacents.next.inner = this.adjacents.next.group.children[0]
-
-        // Text
-        this.adjacents.next.textMesh = this.adjacents.next.inner.children.find(_child => _child.name.startsWith('text'))
-        this.adjacents.next.textCanvas = new TextCanvas(
-            this.texts.fontFamily,
-            this.texts.fontWeight,
-            this.texts.fontSizeMultiplier * 0.3,
-            1.25,
-            0.75,
-            this.texts.density,
-            'center',
-            0.3
-        )
-        this.texts.createMaterialOnMesh(this.adjacents.next.textMesh, this.adjacents.next.textCanvas.texture)
-
         // Arrow
-        const arrowNext = this.references.get('arrowNextProject')[0]
+        const arrowNext = this.references.get('arrowNext')[0]
         arrowNext.material = this.hover.inactiveMaterial
         
         // Intersect
-        const intersectNext = this.references.get('intersectNextProject')[0]
+        const intersectNext = this.references.get('intersectNext')[0]
 
         const intersectNextPosition = new THREE.Vector3()
         intersectNext.getWorldPosition(intersectNextPosition)
 
-        this.adjacents.next.intersect = this.game.cursor.addIntersects({
+        this.adjacents.nextIntersect = this.game.cursor.addIntersects({
             active: false,
             shapes:
             [
@@ -520,7 +488,7 @@ export class Lab
             ],
             onClick: () =>
             {
-                this.nextProject()
+                this.next()
             },
             onEnter: () =>
             {
@@ -916,6 +884,35 @@ export class Lab
             this.cauldron.wood = this.references.get('wood')[0]
             this.cauldron.wood.material = material
         }
+
+        // Liquid
+        {
+            this.cauldron.liquid = {}
+            
+            const colorA = uniform(color('#ff0083'))
+            const colorB = uniform(color('#3018eb'))
+            const intensity = uniform(1.7)
+    
+            const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
+            const mixedColor = mix(colorA, colorB, uv().sub(0.5).length().mul(2)).toVar()
+            material.colorNode = mixedColor.div(luminance(mixedColor)).mul(intensity)
+            material.fog = false
+
+            this.cauldron.liquid.surface = this.references.get('liquid')[0]
+            this.cauldron.liquid.surface.material = material
+
+            this.cauldron.liquid.update = () =>
+            {
+
+            }
+
+            if(this.game.debug.active)
+            {
+                this.game.debug.addThreeColorBinding(this.debugPanel, colorA.value, 'colorA')
+                this.game.debug.addThreeColorBinding(this.debugPanel, colorB.value, 'colorB')
+            }
+        }
+
     }
 
     setLabels()
@@ -963,12 +960,10 @@ export class Lab
             this.blackBoard.timeline.resume()
         }
 
-        // // Cursor
-        // this.adjacents.next.intersect.active = true
-        // this.adjacents.previous.intersect.active = true
-        // this.pagination.previousIntersect.active = true
-        // this.pagination.nextIntersect.active = true
-        // this.url.intersect.active = true
+        // Cursor
+        this.adjacents.nextIntersect.active = true
+        this.adjacents.previousIntersect.active = true
+        this.url.intersect.active = true
 
         // Deactivate physical vehicle
         this.game.physicalVehicle.deactivate()
@@ -1060,5 +1055,10 @@ export class Lab
         this.title.update(direction)
         this.url.update(direction)
         this.images.update()
+    }
+
+    update()
+    {
+        this.cauldron.liquid.update()
     }
 }
