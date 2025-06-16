@@ -654,6 +654,9 @@ export class Lab
         this.scroller.chainRight = this.references.get('chainRight')[0]
         this.scroller.chainPulley = this.references.get('chainPulley')[0]
         this.scroller.progress = 0
+        this.scroller.targetProgress = 0
+        this.scroller.wheelSensitivity = 0.1
+        this.scroller.easing = 3
 
         // Vertical chain material
         {
@@ -811,11 +814,22 @@ export class Lab
 
         this.game.ticker.events.on('tick', () =>
         {
-            this.scroller.progress -= this.game.ticker.deltaScaled * 0.2
+            this.scroller.progress += (this.scroller.targetProgress - this.scroller.progress) * this.game.ticker.deltaScaled * this.scroller.easing
             this.scroller.offset = this.scroller.progress * this.scroller.minis.inter
 
             this.scroller.update()
         })
+
+        // Inputs
+        this.game.inputs.addMap([
+            { name: 'scroll', categories: [ 'cinematic' ], keys: [ 'wheel' ] }
+        ])
+
+        this.game.inputs.events.on('scroll', (wheelValue) =>
+        {
+            this.scroller.targetProgress -= wheelValue * this.scroller.wheelSensitivity
+        })
+
     }
 
     setPendulum()
@@ -1016,7 +1030,7 @@ export class Lab
         })
 
         // Inputs filters
-        this.game.inputs.updateFilters(['cinematic'])
+        this.game.inputs.setFilters(['cinematic'])
 
         // View cinematic
         this.game.view.cinematic.start(this.cinematic.position, this.cinematic.target)
@@ -1062,7 +1076,7 @@ export class Lab
         })
 
         // Input filters
-        this.game.inputs.updateFilters([])
+        this.game.inputs.setFilters(['playing'])
 
         // View cinematic
         this.game.view.cinematic.end()

@@ -6,7 +6,7 @@ import { Game } from './Game.js'
 
 export class Inputs
 {
-    constructor(_map = [])
+    constructor(_map = [], filters = [])
     {
         this.game = Game.getInstance()
         this.events = new Events()
@@ -18,6 +18,7 @@ export class Inputs
         this.setPointer()
         this.setWheel()
         this.addMap(_map)
+        this.setFilters(filters)
     }
 
     addMap(_map)
@@ -29,12 +30,16 @@ export class Inputs
     {
         addEventListener('wheel', (_event) =>
         {
-            // TODO: Prevent hard coding of zoom filter
-            if(this.filters.indexOf('ui') !== -1)
-                return
-
-            const normalized = normalizeWheel(_event)
-            this.events.trigger('zoom', [ normalized.spinY ])
+            const maps = this.map.filter((_map) => _map.keys.indexOf('wheel') !== - 1 )
+            
+            for(const map of maps)
+            {
+                if(this.checkCategory(map))
+                {
+                    const normalized = normalizeWheel(_event)
+                    this.events.trigger(map.name, [ normalized.spinY ])
+                }
+            }
         }, { passive: true })
     }
 
@@ -145,13 +150,16 @@ export class Inputs
 
     down(key)
     {
-        const map = this.map.find((_map) => _map.keys.indexOf(key) !== - 1 )
-
-        if(map && !this.keys[map.name] && this.checkCategory(map))
+        const maps = this.map.filter((_map) => _map.keys.indexOf(key) !== - 1 )
+        
+        for(const map of maps)
         {
-            this.keys[map.name] = true
-            this.events.trigger('keyDown', [ { down: true, name: map.name } ])
-            this.events.trigger(map.name, [ { down: true, name: map.name } ])
+            if(map && !this.keys[map.name] && this.checkCategory(map))
+            {
+                this.keys[map.name] = true
+                this.events.trigger('keyDown', [ { down: true, name: map.name } ])
+                this.events.trigger(map.name, [ { down: true, name: map.name } ])
+            }
         }
     }
 
@@ -167,7 +175,7 @@ export class Inputs
         }
     }
 
-    updateFilters(filters = [])
+    setFilters(filters = [])
     {
         this.filters = filters
     }

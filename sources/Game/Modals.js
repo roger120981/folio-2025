@@ -148,7 +148,7 @@ export class Modals
 
             this.state = Modals.OPENING
             this.current = item
-            this.game.inputs.updateFilters(['modal'])
+            this.game.inputs.setFilters(['modal'])
 
             item.events.trigger('open')
         }
@@ -163,7 +163,7 @@ export class Modals
         this.element.classList.remove('is-visible')
 
         this.state = Modals.CLOSING
-        this.game.inputs.updateFilters([])
+        this.game.inputs.setFilters(['playing'])
         this.current.events.trigger('close')
     }
 

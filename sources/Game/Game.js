@@ -127,7 +127,7 @@ export class Game
 
         this.server = new Server()
         this.ticker = new Ticker()
-        this.inputs = new Inputs()
+        this.inputs = new Inputs([], ['modal'])
         this.cursor = new Cursor()
         this.debug = new Debug()
         this.time = new Time()

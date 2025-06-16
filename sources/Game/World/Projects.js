@@ -1197,7 +1197,7 @@ export class Projects
         })
 
         // Inputs filters
-        this.game.inputs.updateFilters(['cinematic'])
+        this.game.inputs.setFilters(['cinematic'])
 
         // View cinematic
         this.game.view.cinematic.start(this.cinematic.position, this.cinematic.target)
@@ -1248,7 +1248,7 @@ export class Projects
         })
 
         // Input filters
-        this.game.inputs.updateFilters([])
+        this.game.inputs.setFilters(['playing'])
 
         // View cinematic
         this.game.view.cinematic.end()

@@ -220,9 +220,13 @@ export class View
         this.zoom.speedEdge = { min: 5, max: 40 }
         this.zoom.sensitivity = 0.05
 
-        this.game.inputs.events.on('zoom', (zoomValue) =>
+        this.game.inputs.addMap([
+            { name: 'zoom', categories: [ 'playing' ], keys: [ 'wheel' ] }
+        ])
+
+        this.game.inputs.events.on('zoom', (wheelValue) =>
         {
-            this.zoom.baseRatio -= zoomValue * this.zoom.sensitivity
+            this.zoom.baseRatio -= wheelValue * this.zoom.sensitivity
             this.zoom.baseRatio = clamp(this.zoom.baseRatio, 0, 1)
         })
 
