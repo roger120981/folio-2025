@@ -78,7 +78,7 @@ export class InteractiveAreas
     create(position, text = '', align = InteractiveAreas.ALIGN_LEFT, callback)
     {
         const newPosition = position.clone()
-        newPosition.y = 2.25
+        // newPosition.y = 2.25
 
         /**
          * Group
@@ -95,7 +95,7 @@ export class InteractiveAreas
          * Diamond
          */
         // Material
-        const diamondMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true })
+        const diamondMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: false })
 
         const threshold = uniform(0.250)
         const lineThickness = uniform(0.150)
@@ -133,7 +133,7 @@ export class InteractiveAreas
          * Key
          */
         // Material
-        const keyMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true })
+        const keyMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: false })
 
         keyMaterial.outputNode = Fn(() =>
         {
@@ -197,7 +197,7 @@ export class InteractiveAreas
         labelTexture.needsUpdate = true
 
         // Material
-        const labelMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true })
+        const labelMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: false })
 
         const labelOffset = uniform(1)
         labelMaterial.outputNode = Fn(() =>
@@ -330,30 +330,51 @@ export class InteractiveAreas
         const playerPosition2 = new THREE.Vector2(this.game.player.position.x, this.game.player.position.z)
         this.playerPosition.value.copy(playerPosition2)
 
+        let distance = Infinity
+        let inItem = null
         for(const item of this.items)
         {
             if(!item.state !== InteractiveAreas.STATE_HIDDEN)
             {
-                const isIn = Math.abs(item.position.x - playerPosition2.x) < 2 && Math.abs(item.position.y - playerPosition2.y) < 2
-
-                if(isIn !== item.isIn)
+                const itemDistance = Math.hypot(item.position.x - playerPosition2.x, item.position.y - playerPosition2.y)
+                const isIn = itemDistance < 2.5
+                
+                if(isIn)
                 {
-                    item.isIn = isIn
-
-                    if(isIn)
+                    if(itemDistance < distance)
                     {
-                        this.activeItem = item
-
-                        item.open()
+                        inItem = inItem = item
                     }
-                    else
+                }
+                else
+                {
+                    if(item.isIn)
                     {
-                        this.activeItem = null
-
+                        item.isIn = false
                         item.close()
                     }
                 }
             }
+        }
+
+        if(inItem)
+        {
+            if(inItem !== this.activeItem && this.activeItem !== null)
+            {
+                this.activeItem.isIn = false
+                this.activeItem.close()
+            }
+            if(!inItem.isIn)
+            {
+                this.activeItem = inItem
+
+                inItem.isIn = true
+                inItem.open()
+            }
+        }
+        else
+        {
+            this.activeItem = null
         }
     }
 }

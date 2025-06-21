@@ -14,6 +14,7 @@ import { Intro } from './Intro.js'
 import { Controls } from './Controls.js'
 import { Projects } from './Projects.js'
 import { Lab } from './Lab.js'
+import { Bruno } from './Bruno.js'
 
 export class Scenery
 {
@@ -40,6 +41,10 @@ export class Scenery
         this.cherryTrees = new Trees('Cherry Tree', this.game.resources.cherryTreesVisualModel.scene, this.game.resources.cherryTreesReferencesModel.scene.children, '#ff6da8')
         this.flowers = new Flowers()
         this.bricks = new Bricks()
+
+        const brunoReferences = this.references.getStartingWith('bruno')
+        if(brunoReferences.size)
+            this.bruno = new Bruno(brunoReferences)
 
         const labReferences = this.references.getStartingWith('lab')
         if(labReferences.size)

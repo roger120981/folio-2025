@@ -68,7 +68,7 @@ export class View
         if(this.game.debug.active)
         {
             this.game.inputs.addMap([
-                { name: 'viewToggle', categories: [ 'debug' ], keys: [ 'KeyV' ] }
+                { name: 'viewToggle', categories: [], keys: [ 'KeyV' ] }
             ])
 
             this.game.inputs.events.on('viewToggle', (event) =>

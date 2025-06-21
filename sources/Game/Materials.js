@@ -22,9 +22,14 @@ export class Materials
         this.setPreviews()
 
         this.createEmissiveGradient('emissiveGradientWarm', '#ff8641', '#ff3e00', 1.7, this.debugPanel?.addFolder({ title: 'emissiveGradientWarm' }))
+        this.createEmissiveGradient('emissivePurpleRadialGradient', '#b65fff', '#ff3243', 1.7, this.debugPanel?.addFolder({ title: 'emissivePurpleRadialGradient' }))
+        this.createEmissiveGradient('emissiveBlueRadialGradient', '#91f0ff', '#128fff', 1.7, this.debugPanel?.addFolder({ title: 'emissiveBlueRadialGradient' }))
+        this.createEmissiveGradient('emissiveGreenRadialGradient', '#a2ffab', '#ccff00', 1.7, this.debugPanel?.addFolder({ title: 'emissiveGreenRadialGradient' }))
         this.createEmissive('emissiveOrange', '#ff3e00', 3, this.debugPanel?.addFolder({ title: 'emissiveOrange' }))
         this.createEmissive('emissiveRed', '#ff3131', 3, this.debugPanel?.addFolder({ title: 'emissiveRed' }))
         this.createEmissive('emissivePurple', '#a64dff', 3, this.debugPanel?.addFolder({ title: 'emissivePurple' }))
+        this.createEmissive('emissiveGreen', '#b2ff31', 3, this.debugPanel?.addFolder({ title: 'emissiveGreen' }))
+        this.createEmissive('emissiveBlue', '#3250ff', 3, this.debugPanel?.addFolder({ title: 'emissiveBlue' }))
         this.createGradient('carGradient', '#ff3a3a', '#721551', this.debugPanel?.addFolder({ title: 'carGradient' }))
     }
 
