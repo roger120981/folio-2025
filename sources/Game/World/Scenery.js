@@ -16,6 +16,7 @@ import { Projects } from './Projects.js'
 import { Lab } from './Lab.js'
 import { Career } from './Career.js'
 import { Social } from './Social.js'
+import { Toilet } from './Toilet.js'
 
 export class Scenery
 {
@@ -42,6 +43,10 @@ export class Scenery
         this.cherryTrees = new Trees('Cherry Tree', this.game.resources.cherryTreesVisualModel.scene, this.game.resources.cherryTreesReferencesModel.scene.children, '#ff6da8')
         this.flowers = new Flowers()
         this.bricks = new Bricks()
+
+        const toiletReferences = this.references.getStartingWith('toilet')
+        if(toiletReferences.size)
+            this.toilet = new Toilet(toiletReferences)
 
         const careerReferences = this.references.getStartingWith('career')
         if(careerReferences.size)

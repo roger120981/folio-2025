@@ -26,8 +26,8 @@ export class Cycles
         this.progressDelta = 1
         this.keyframesList = []
         this.properties = []
-        this.punctualEvents = []
-        this.intervalEvents = []
+        this.punctualEvents = new Map()
+        this.intervalEvents = new Map()
         this.events = new Events()
 
         // Debug
@@ -151,7 +151,7 @@ export class Cycles
         const newProgress = this.absoluteProgress % 1
 
         // Test punctual events
-        for(const punctualEvent of this.punctualEvents)
+        this.punctualEvents.forEach((punctualEvent) =>
         {
             if(newProgress >= punctualEvent.progress && this.progress < punctualEvent.progress)
             {
@@ -163,10 +163,10 @@ export class Cycles
                 else
                     this.events.trigger(punctualEvent.name)
             }
-        }
+        })
 
         // Test interval events
-        for(const intervalEvent of this.intervalEvents)
+        this.intervalEvents.forEach((intervalEvent) =>
         {
             const inInterval = newProgress > intervalEvent.startProgress && newProgress < intervalEvent.endProgress
 
@@ -192,7 +192,7 @@ export class Cycles
                 else
                     this.events.trigger(intervalEvent.name, [ intervalEvent.inInverval ])
             }
-        }
+        })
 
         // Progress
         this.progress = newProgress % 1
@@ -273,7 +273,7 @@ export class Cycles
 
     addPunctualEvent(name, progress)
     {
-        this.punctualEvents.push({ name, progress })
+        this.punctualEvents.set(name, { name, progress })
     }
 
     setIntervals()
@@ -288,6 +288,6 @@ export class Cycles
 
     addIntervalEvent(name, startProgress, endProgress)
     {
-        this.intervalEvents.push({ name, startProgress, endProgress, inInverval: false })
+        this.intervalEvents.set(name, { name, startProgress, endProgress, inInverval: false })
     }
 }
