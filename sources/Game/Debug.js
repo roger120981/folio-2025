@@ -59,7 +59,6 @@ export class Debug
                         binding.manual = false
                         binding.update()
                         binding.manualValue = object[property]
-                        binding.instance.refresh()
                     }
                 },
                 ''
