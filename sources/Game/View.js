@@ -213,10 +213,7 @@ export class View
             this.optimalArea.helpers.center.position.copy(this.optimalArea.basePosition)
 
             // Radius
-            const optimalRadius = this.optimalArea.basePosition.distanceTo(this.optimalArea.farPosition)
-
-            if(optimalRadius > this.optimalArea.radius)
-                this.optimalArea.radius = optimalRadius
+            this.optimalArea.radius = this.optimalArea.basePosition.distanceTo(this.optimalArea.farPosition)
 
             // Distances
             this.optimalArea.raycaster.setFromCamera(new THREE.Vector2(0, -1), this.defaultCamera)

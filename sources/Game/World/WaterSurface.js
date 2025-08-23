@@ -61,8 +61,7 @@ export class WaterSurface
 
     setGeometry()
     {
-        const halfExtent = this.game.view.optimalArea.radius
-        this.geometry = new THREE.PlaneGeometry(halfExtent * 2, halfExtent * 2, 1, 1)
+        this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1)
         this.geometry.rotateX(- Math.PI * 0.5)
     }
 
@@ -328,10 +327,22 @@ export class WaterSurface
     setMesh()
     {
         this.mesh = new THREE.Mesh(this.geometry, this.material)
+        
+        const halfExtent = this.game.view.optimalArea.radius
+        this.mesh.scale.setScalar(halfExtent * 2)
+        console.log(halfExtent * 2)
+
         this.mesh.position.y = - 0.3
         this.mesh.castShadow = true
         this.mesh.receiveShadow = true
         this.game.scene.add(this.mesh)
+
+        this.game.viewport.events.on('throttleChange', () =>
+        {
+            const halfExtent = this.game.view.optimalArea.radius
+            this.mesh.scale.setScalar(halfExtent * 2)
+            console.log(halfExtent * 2)
+        }, 2)
     }
 
     update()
