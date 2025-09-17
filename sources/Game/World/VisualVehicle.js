@@ -3,6 +3,8 @@ import { Game } from '../Game.js'
 import { Track } from '../Tracks.js'
 import { Trails } from '../Trails.js'
 import { remapClamp } from '../utilities/maths.js'
+import { mix, uniform } from 'three/tsl'
+import { clamp } from 'three/src/math/MathUtils.js'
 
 export class VisualVehicle
 {
@@ -16,6 +18,7 @@ export class VisualVehicle
         this.setBlinkers()
         this.setAntenna()
         this.setBoostTrails()
+        this.setBoostAnimation()
         this.setScreenPosition()
 
         this.game.ticker.events.on('tick', () =>
@@ -62,6 +65,14 @@ export class VisualVehicle
 
         // Antenna
         this.parts.antenna = this.parts.chassis.getObjectByName('antenna')
+
+        // Cells
+        this.parts.cell1 = this.parts.chassis.getObjectByName('cell1')
+        this.parts.cell2 = this.parts.chassis.getObjectByName('cell2')
+        this.parts.cell3 = this.parts.chassis.getObjectByName('cell3')
+
+        // Energy
+        this.parts.energy = this.parts.chassis.getObjectByName('energy')
     }
 
     setMainGroundTrack()
@@ -187,6 +198,25 @@ export class VisualVehicle
         this.boostTrails.rightReference.getWorldPosition(this.boostTrails.right.position)
     }
 
+    setBoostAnimation()
+    {
+        this.boostAnimation = {}
+        this.boostAnimation.mix = 0
+        this.boostAnimation.speed = 0.5
+        this.boostAnimation.mixUniform = uniform(0)
+
+        // Energy
+        {
+            const emissiveOuput = this.game.materials.getFromName('emissivePurpleRadialGradient').outputNode
+            const defaultOutput = this.parts.energy.material.outputNode
+
+            const material = new THREE.MeshLambertNodeMaterial()
+            material.outputNode = mix(defaultOutput, emissiveOuput, this.boostAnimation.mixUniform)
+
+            this.parts.energy.material = material
+        }
+    }
+
     setScreenPosition()
     {
         this.screenPosition = new THREE.Vector2(0, 0)
@@ -271,6 +301,15 @@ export class VisualVehicle
         this.boostTrails.left.alpha = trailAlpha
         this.boostTrails.rightReference.getWorldPosition(this.boostTrails.right.position)
         this.boostTrails.right.alpha = trailAlpha
+
+        // Boost animation
+        this.boostAnimation.mix += (this.game.player.boosting ? 1 : - 1) * this.game.ticker.deltaScaled * this.boostAnimation.speed
+        this.boostAnimation.mix = clamp(this.boostAnimation.mix, 0, 1)
+        // this.boostAnimation.mixUniform.value = remapClamp(this.boostAnimation.mix, 0, 0.2, 0, 1)
+        this.boostAnimation.mixUniform.value = 1 - Math.pow(1 - this.boostAnimation.mix, 7)
+        this.parts.cell1.position.y = remapClamp(this.boostAnimation.mix, 0, 0.6, 0.2, 0)
+        this.parts.cell3.position.y = remapClamp(this.boostAnimation.mix, 0.2, 0.8, 0.2, 0)
+        this.parts.cell2.position.y = remapClamp(this.boostAnimation.mix, 0.4, 1, 0.2, 0)
 
         // Screen position
         const vector = new THREE.Vector3()

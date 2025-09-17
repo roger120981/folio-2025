@@ -133,7 +133,7 @@ export class Materials
         if(normalize)
             mixedColor = mixedColor.div(luminance(mixedColor))
 
-        material.colorNode = mixedColor.mul(intensity)
+        material.outputNode = vec4(mixedColor.mul(intensity), 1)
         material.fog = false
         this.save(_name, material)
 
