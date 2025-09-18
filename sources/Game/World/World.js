@@ -20,6 +20,8 @@ import { Bricks } from './Bricks.js'
 import { Trees } from './Trees.js'
 import { Bushes } from './Bushes.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
+import { Fireballs } from './Fireballs.js'
+import { ExplosiveCrates } from './ExplosiveCrates.js'
 
 export class World
 {
@@ -36,6 +38,7 @@ export class World
         this.leaves = new Leaves()
         this.rainSnow = new Rain()
         this.lightnings = new Lightnings()
+        this.fireballs = new Fireballs()
         this.snow = new Snow()
         this.whispers = new Whispers()
         this.tornado = new Tornado()
@@ -45,6 +48,7 @@ export class World
         this.cherryTrees = new Trees('Cherry Tree', this.game.resources.cherryTreesVisualModel.scene, this.game.resources.cherryTreesReferencesModel.scene.children, '#ff6da8')
         this.flowers = new Flowers()
         this.bricks = new Bricks()
+        this.explosiveCrates = new ExplosiveCrates()
         this.areas = new Areas()
 
         // this.easter = new Easter()

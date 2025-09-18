@@ -16,15 +16,16 @@ export class Objects
 
     add(_visualDescription = null, _physicalDescription = null)
     {
-        const object = { visual: null, physical: null }
+        const object = {
+            visual: null,
+            physical: null
+        }
 
         /**
          * Visual
          */
         if(_visualDescription && _visualDescription.model)
         {
-            object.visual = _visualDescription.model
-
             // Default parameters
             const visualDescription = {
                 updateMaterials: true,
@@ -34,6 +35,11 @@ export class Objects
                 ..._visualDescription
             }
             
+            // Visual
+            const visual = {}
+            visual.object3D = _visualDescription.model
+            visual.parent = visualDescription.parent
+
             // Update materials
             if(visualDescription.updateMaterials)
                 this.game.materials.updateObject(visualDescription.model)
@@ -56,7 +62,10 @@ export class Objects
 
             // Add to scene
             if(visualDescription.parent !== null)
-                visualDescription.parent.add(object.visual)
+                visualDescription.parent.add(visual.object3D)
+
+            // Save
+            object.visual = visual
         }
 
         /**
@@ -78,8 +87,8 @@ export class Objects
         {
             if(_physicalDescription.sleeping || !_physicalDescription.enabled || object.physical.type === 'fixed')
             {
-                object.visual.position.copy(object.physical.body.translation())
-                object.visual.quaternion.copy(object.physical.body.rotation())
+                object.visual.object3D.position.copy(object.physical.body.translation())
+                object.visual.object3D.quaternion.copy(object.physical.body.rotation())
             }
         }
 
@@ -162,6 +171,7 @@ export class Objects
                     object.physical.body.setRotation(object.physical.initialState.rotation)
                     object.physical.body.setLinvel({ x: 0, y: 0, z: 0 })
                     object.physical.body.setAngvel({ x: 0, y: 0, z: 0 })
+                    object.physical.body.setEnabled(true)
                     
                     if(object.physical.initialState.sleeping)
                     {
@@ -173,12 +183,21 @@ export class Objects
                     
                     if(object.visual)
                     {
-                        object.visual.position.copy(object.physical.initialState.position)
-                        object.visual.quaternion.copy(object.physical.initialState.rotation)
+                        if(object.visual.parent)
+                            object.visual.parent.add(object.visual.object3D)
+                        object.visual.object3D.position.copy(object.physical.initialState.position)
+                        object.visual.object3D.quaternion.copy(object.physical.initialState.rotation)
                     }
                 }
             }
         })
+    }
+
+    disable(object)
+    {
+        // this.game.physics.world.removeRigidBody(object.physical.body)
+        object.physical.body.setEnabled(false)
+        object.visual.object3D.removeFromParent()
     }
 
     update()
@@ -189,8 +208,8 @@ export class Objects
             {
                 if(!_object.physical.body.isSleeping())
                 {
-                    _object.visual.position.copy(_object.physical.body.translation())
-                    _object.visual.quaternion.copy(_object.physical.body.rotation())
+                    _object.visual.object3D.position.copy(_object.physical.body.translation())
+                    _object.visual.object3D.quaternion.copy(_object.physical.body.rotation())
                 }
             }
         })

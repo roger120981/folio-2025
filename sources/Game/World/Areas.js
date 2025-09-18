@@ -11,6 +11,7 @@ import { Lab } from './Lab.js'
 import { Career } from './Career.js'
 import { Social } from './Social.js'
 import { Toilet } from './Toilet.js'
+import { ExplosiveCrates } from './ExplosiveCrates.js'
 
 export class Areas
 {

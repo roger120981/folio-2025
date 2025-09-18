@@ -94,12 +94,17 @@ export class Bonfire
             InteractivePoints.ALIGN_RIGHT,
             () =>
             {
+                // Interactive buttons
                 this.game.inputs.interactiveButtons.clearItems()
+
+                // Player respawn
                 this.game.player.respawn(null, () =>
                 {
+                    // Bonfire
                     this.particles.visible = true
                     this.burn.material = this.game.materials.getFromName('emissiveOrangeRadialGradient')
 
+                    // Objects reset
                     this.game.objects.reset()
                 })
             },

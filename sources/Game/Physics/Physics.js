@@ -11,6 +11,7 @@ export class Physics
         this.game = Game.getInstance()
 
         this.world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 })
+        // this.eventQueue = new RAPIER.EventQueue(true)
 
         this.physicals = []
 
@@ -20,12 +21,9 @@ export class Physics
             bumper:  0b0000000000000100
         }
         this.categories = {
-            floor: (this.groups.all) << 16 |
-                     (this.groups.all),
-            object: (this.groups.all | this.groups.object) << 16 |
-                    (this.groups.all | this.groups.bumper),
-            bumper: (this.groups.bumper) << 16 |
-                    this.groups.object,
+            floor: (this.groups.all) << 16 | (this.groups.all),
+            object: (this.groups.all | this.groups.object) << 16 | (this.groups.all | this.groups.bumper),
+            bumper: (this.groups.bumper) << 16 | this.groups.object,
         }
 
         // this.world.integrationParameters.numSolverIterations = 4 // 4
@@ -150,8 +148,9 @@ export class Physics
                 category = _colliderDescription.category
 
             colliderDescription = colliderDescription.setCollisionGroups(this.categories[category])
-            // colliderDescription = colliderDescription.setCollisionGroups(this.getBinaryGroups(groups))
-            // colliderDescription = colliderDescription.setSolverGroups(this.getBinaryGroups(groups))
+
+            // if(typeof _colliderDescription.hasEvents !== 'undefined' && _colliderDescription.hasEvents === true)
+            //     colliderDescription = colliderDescription.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS)
 
             const collider = this.world.createCollider(colliderDescription, physical.body)
             physical.colliders.push(collider)
@@ -171,10 +170,6 @@ export class Physics
 
     update()
     {
-        // this.world.vehicleControllers.forEach((_vehicleController) =>
-        // {
-        //     _vehicleController.updateVehicle(this.game.ticker.delta)
-        // })
         this.world.timestep = this.game.ticker.deltaScaled
     
         for(const physical of this.physicals)
@@ -184,5 +179,28 @@ export class Physics
         }
         
         this.world.step()
+        // this.world.step(this.eventQueue)
+
+        // Works but not handy
+        // this.eventQueue.drainCollisionEvents((handle1, handle2, started) =>
+        // {
+        //     if(started)
+        //     {
+        //         const collider1 = this.world.getCollider(handle1)
+        //         const collider2 = this.world.getCollider(handle2)
+
+        //         console.log('---')
+        //         console.log(collider1)
+        //         console.log(collider2)
+        //     }
+        // })
+
+        // Doesn't work
+        // this.eventQueue.drainContactForceEvents(event =>
+        // {
+        //     // let handle1 = event.collider1(); // Handle of the first collider involved in the event.
+        //     // let handle2 = event.collider2(); // Handle of the second collider involved in the event.
+        //     console.log('b')
+        // })
     }
 }

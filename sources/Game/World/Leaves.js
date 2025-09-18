@@ -29,7 +29,6 @@ export class Leaves
         this.setGeometry()
         this.setMaterial()
         this.setMesh()
-        this.setExplosions()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -281,29 +280,12 @@ export class Leaves
         this.game.scene.add(this.mesh)
     }
 
-    setExplosions()
+    explode(coordinates, radius)
     {
-        this.game.explosions.events.on('explosion', (coordinates) =>
-        {
-            this.explosion.value.x = coordinates.x // X
-            this.explosion.value.y = coordinates.z // Z
-            this.explosion.value.z = 4 // Radius
-            this.explosion.value.w = 1 // Strength
-        })
-        
-        const test = () =>
-        {
-            if(this.game.tornado.strength)
-            {
-                this.explosion.value.set(
-                    this.game.tornado.position.x + (Math.random() - 0.5) * 8,
-                    this.game.tornado.position.z + (Math.random() - 0.5) * 8,
-                    4,
-                    this.game.tornado.strength * Math.random() * 0.4
-                )
-            }
-        }
-        gsap.set(test, {delay: 0.1, onRepeat: test, repeat: -1, repeatDelay: 0.1})
+        this.explosion.value.x = coordinates.x // X
+        this.explosion.value.y = coordinates.z // Z
+        this.explosion.value.z = radius // Radius
+        this.explosion.value.w = 1 // Strength
     }
 
     update()

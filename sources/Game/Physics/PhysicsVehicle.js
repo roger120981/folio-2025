@@ -72,7 +72,6 @@ export class PhysicsVehicle
         this.setStop()
         this.setUpsideDown()
         this.setStuck()
-        this.setExplosions()
         this.setTornado()
 
         this.game.ticker.events.on('tick', () =>
@@ -88,7 +87,7 @@ export class PhysicsVehicle
     setChassis()
     {
         this.chassis = {}
-        this.chassis.physical = this.game.physics.getPhysical({
+        const object = this.game.objects.add(null, {
             type: 'dynamic',
             position: this.position,
             friction: 0.4,
@@ -101,6 +100,7 @@ export class PhysicsVehicle
             canSleep: false,
             waterGravityMultiplier: 0
         })
+        this.chassis.physical = object.physical
         this.chassis.mass = this.chassis.physical.body.mass()
     }
 
@@ -304,30 +304,6 @@ export class PhysicsVehicle
                 }
             }
         }
-    }
-
-    setExplosions()
-    {
-        this.game.explosions.events.on('explosion', (coordinates) =>
-        {
-            const direction = this.position.clone().sub(coordinates)
-            direction.y = 0
-            const distance = Math.hypot(direction.x, direction.z)
-
-            const strength = remapClamp(distance, 1, 7, 1, 0)
-            const impulse = direction.clone().normalize()
-            impulse.y = 1
-            impulse.setLength(strength * this.chassis.mass * 4)
-
-            if(strength > 0)
-            {
-                const point = direction.negate().setLength(0).add(this.position)
-                requestAnimationFrame(() =>
-                {
-                    this.chassis.physical.body.applyImpulseAtPoint(impulse, point)
-                })
-            }
-        })
     }
 
     setTornado()

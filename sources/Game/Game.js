@@ -75,6 +75,7 @@ export class Game
                     [ 'flowersReferencesModel',                'flowers/flowersReferences.glb',                        'gltf'    ],
                     [ 'bricksReferencesModel',                 'bricks/bricksReferences.glb',                          'gltf'    ],
                     [ 'bricksVisualModel',                     'bricks/bricksVisual.glb',                              'gltf'    ],
+                    [ 'cratesModel',                           'crates/crates.glb',                                    'gltf'    ],
                     [ 'terrainTexture',                        'terrain/terrain.png',                                  'texture' ],
                     // [ 'terrainTexture',                        'terrain/flatGrass.png',                                'texture' ],
                     [ 'terrainModel',                          'terrain/terrain.glb',                                  'gltf'    ],
