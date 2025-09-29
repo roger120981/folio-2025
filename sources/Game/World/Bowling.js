@@ -411,9 +411,11 @@ export class Bowling
         // Screen position
         const targetX = clamp(this.game.player.position.x, this.screen.min, this.screen.max)
         this.screen.x += (targetX - this.screen.x) * this.game.ticker.deltaScaled * 2
+
+        const floatY = Math.sin(this.game.ticker.elapsedScaled * 0.3) * 0.5
         this.screen.object.physical.body.setNextKinematicTranslation({
             x: this.screen.x,
-            y: this.screen.group.position.y,
+            y: 0.5 + floatY,
             z: this.screen.group.position.z
         })
         this.screen.object.needsUpdate = true
