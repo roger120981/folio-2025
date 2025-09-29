@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import { Foliage } from './Foliage.js'
+import { color, uniform } from 'three/tsl'
 
 export class Trees
 {
@@ -79,13 +80,13 @@ export class Trees
             }
         }
 
-        this.leavesColor = new THREE.Color(this.color)
-        this.leaves = new Foliage(references, this.leavesColor, true)
+        const leavesColorNode = uniform(color(this.color))
+        this.leaves = new Foliage(references, leavesColorNode, true)
 
         // Debug
         if(this.game.debug.active)
         {
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.leavesColor, 'leavesColor')
+            this.game.debug.addThreeColorBinding(this.debugPanel, leavesColorNode.value, 'leavesColor')
             this.debugPanel.addBinding(this.leaves.material.shadowOffset, 'value', { label: 'shadowOffset', min: 0, max: 2, step: 0.001 })
             this.debugPanel.addBinding(this.leaves.material.threshold, 'value', { label: 'threshold', min: 0, max: 1, step: 0.001 })
             this.debugPanel.addBinding(this.leaves.material.seeThroughEdgeMin, 'value', { label: 'seeThroughEdgeMin', min: 0, max: 1, step: 0.001 })

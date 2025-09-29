@@ -10,12 +10,12 @@ const rng = new alea('foliage')
 
 export class Foliage
 {
-    constructor(references, color, seeThrough = false)
+    constructor(references, colorNode, seeThrough = false)
     {
         this.game = Game.getInstance()
 
         this.references = references
-        this.color = color
+        this.colorNode = colorNode
         this.seeThrough = seeThrough
 
         this.setGeometry()
@@ -127,7 +127,7 @@ export class Foliage
         // Instance
         this.material.instance = new MeshDefaultMaterial({
             // shadowSide: THREE.FrontSide,
-            colorNode: color(this.color),
+            colorNode: this.colorNode,
             alphaNode: alphaNode,
             hasWater: false
         })
