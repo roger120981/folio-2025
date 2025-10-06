@@ -9,6 +9,11 @@ import { color, Fn, max, PI, positionWorld, texture, uniform, uv, vec2, vec3, ve
 
 export default class Circuit
 {
+    static STATE_PENDING = 1
+    static STATE_STARTING = 2
+    static STATE_RUNNING = 3
+    static STATE_ENDED = 4
+
     constructor(references)
     {
         this.game = Game.getInstance()
@@ -23,6 +28,7 @@ export default class Circuit
         }
 
         this.references = references
+        this.state = Circuit.STATE_PENDING
 
         this.setStartPosition()
         this.setRoad()
@@ -114,53 +120,157 @@ export default class Circuit
     {
         this.timer = {}
 
-        this.timer.element = this.game.domElement.querySelector('.js-circuit-timer')
-        this.timer.digits = [...this.timer.element.querySelectorAll('.js-digit')]
-
+        this.timer.visible = true
         this.timer.startTime = 0
         this.timer.endTime = 0
         this.timer.running = false
+        this.timer.group = this.references.get('timer')[0]
+        this.timer.group.rotation.y = Math.PI * 0.1
+        this.timer.group.visible = false
 
-        this.timer.start = () =>
+        // Digits
         {
-            this.timer.startTime = this.game.ticker.elapsed
+            this.timer.digits = {}
+            this.timer.digits.ratio = 6
+            this.timer.digits.height = 32
+            this.timer.digits.width = 32 * 6
+            
+            // Canvas
+            const font = `700 ${this.timer.digits.height}px "Nunito"`
 
-            this.timer.running = true
+            const canvas = document.createElement('canvas')
+            canvas.style.position = 'fixed'
+            canvas.style.zIndex = 999
+            canvas.style.top = 0
+            canvas.style.left = 0
+            // document.body.append(canvas)
 
-            this.timer.element.classList.add('is-visible')
+            const context = canvas.getContext('2d')
+            context.font = font
+
+            canvas.width = this.timer.digits.height * this.timer.digits.ratio
+            canvas.height = this.timer.digits.height
+
+            context.fillStyle = '#000000'
+            context.fillRect(0, 0, canvas.width, canvas.height)
+
+            context.font = font
+            context.fillStyle = '#ffffff'
+            context.textAlign = 'center'
+            context.textBaseline = 'middle'
+            context.fillText('00:00:000', this.timer.digits.width * 0.5, this.timer.digits.height * 0.5)
+            this.timer.digits.context = context
+
+            // Texture
+            const texture = new THREE.Texture(canvas)
+            texture.minFilter = THREE.NearestFilter
+            texture.magFilter = THREE.NearestFilter
+            texture.generateMipmaps = false
+
+            this.timer.digits.texture = texture
+
+            // Digits
+            const geometry = new THREE.PlaneGeometry(this.timer.digits.ratio, 1)
+            const material = new THREE.MeshBasicNodeMaterial({
+                alphaMap: this.timer.digits.texture,
+                alphaTest: 0.5
+            })
+            const mesh = new THREE.Mesh(geometry, material)
+            mesh.scale.setScalar(0.5)
+            this.timer.group.add(mesh)
         }
 
+        // Write
+        this.timer.write = (text) =>
+        {
+            this.timer.digits.context.fillStyle = '#000000'
+            this.timer.digits.context.fillRect(0, 0, this.timer.digits.width, this.timer.digits.height)
+            
+            this.timer.digits.context.fillStyle = '#ffffff'
+            this.timer.digits.context.fillText(text, this.timer.digits.width * 0.5, this.timer.digits.height * 0.5)
+
+            this.timer.digits.texture.needsUpdate = true
+        }
+
+        // Show
+        this.timer.show = () =>
+        {
+            this.timer.visible = true
+
+            this.timer.write('00:00:000')
+
+            this.timer.group.position.copy(this.game.player.position)
+            this.timer.group.position.y = 2.5
+            this.timer.group.scale.setScalar(1)
+
+            this.timer.group.visible = true
+        }
+
+        // Hide
+        this.timer.hide = () =>
+        {
+            const value = { scale: 1 }
+
+            gsap.to(
+                value,
+                {
+                    scale: 0,
+                    duration: 1,
+                    ease: 'back.in(2)',
+                    onUpdate: () =>
+                    {
+                        this.timer.group.scale.setScalar(value.scale)
+                    },
+                    onComplete: () =>
+                    {
+                        this.timer.group.visible = false
+                    }
+                }
+            )
+            
+            this.timer.visible = false
+        }
+
+        // Start
+        this.timer.start = () =>
+        {
+            this.timer.running = true
+
+            this.timer.startTime = this.game.ticker.elapsed
+        }
+
+        // End
         this.timer.end = () =>
         {
             this.timer.endTime = this.game.ticker.elapsed
 
             this.timer.running = false
-
-            gsap.delayedCall(6, () =>
-            {
-                this.timer.element.classList.remove('is-visible')
-            })
         }
 
         this.timer.update = () =>
         {
-            if(!this.timer.running)
-                return
+            // Group > Follow car
+            const target = new THREE.Vector3(
+                this.game.player.position.x -  2,
+                2.5,
+                this.game.player.position.z + 1
+            )
+            this.timer.group.position.lerp(target, this.game.ticker.deltaScaled * 5)
+            // this.timer.group.position.z = this.game.player.position2.y
 
-            const currentTime = this.game.ticker.elapsed
-            const elapsedTime = currentTime - this.timer.startTime
-
-            const minutes = Math.floor(elapsedTime / 60)
-            const seconds = Math.floor((elapsedTime % 60))
-            const milliseconds = Math.floor((elapsedTime * 1000) % 1000)
-
-            const digitsString = `${String(minutes).padStart(2, '0')}${String(seconds).padStart(2, '0')}${String(milliseconds).padStart(2, '0')}`
-
-            let i = 0
-            for(const digit of digitsString)
+            // Digits
+            if(this.timer.running)
             {
-                this.timer.digits[i].textContent = digit
-                i++
+                const currentTime = this.game.ticker.elapsed
+                const elapsedTime = currentTime - this.timer.startTime
+
+                const minutes = Math.floor(elapsedTime / 60)
+                const seconds = Math.floor((elapsedTime % 60))
+                const milliseconds = Math.floor((elapsedTime * 1000) % 1000)
+
+                const digitsString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(3, '0')}`
+
+                this.timer.write(digitsString)
             }
         }
     }
@@ -258,7 +368,7 @@ export default class Circuit
                 // Final checkpoint (start line)
                 if(this.checkpoints.reachedCount === this.checkpoints.count + 2)
                 {
-                    this.end()
+                    this.finish()
                 }
 
                 // Next checkpoint
@@ -408,7 +518,7 @@ export default class Circuit
     {
         this.startAnimation = {}
         this.startAnimation.timeline = gsap.timeline({ paused: true })
-        this.startAnimation.interDuration = 2
+        this.startAnimation.interDuration = 0.5
         this.startAnimation.endCallback = null
 
         this.startAnimation.timeline.add(() =>
@@ -445,6 +555,12 @@ export default class Circuit
 
     restart()
     {
+        if(this.state === Circuit.STATE_STARTING)
+            return
+            
+        // State
+        this.state = Circuit.STATE_STARTING
+
         // Player > Lock
         this.game.player.state = Player.STATE_LOCKED
 
@@ -497,9 +613,14 @@ export default class Circuit
                 1
             )
 
+            // Timer
+            this.timer.show()
+
             // Overlay > Hide
             this.game.overlay.hide(() =>
             {
+                // State
+                this.state = Circuit.STATE_RUNNING
 
                 // Start animation
                 this.startAnimation.start(() =>
@@ -514,24 +635,52 @@ export default class Circuit
         })
     }
 
-    end()
+    finish()
     {
+        if(this.state === Circuit.STATE_ENDED)
+            return
+            
+        // State
+        this.state = Circuit.STATE_ENDED
+        
+        // Timer
         this.timer.end()
 
+        // Checkpoints
         this.checkpoints.target = null
         this.checkpoints.doorTarget.mesh.visible = false
 
+        gsap.delayedCall(3, () =>
+        {
+            this.end()
+        })
+    }
+
+    end()
+    {
+        if(this.state === Circuit.STATE_PENDING)
+            return
+            
+        // State
+        this.state = Circuit.STATE_PENDING
+
+        // Timer
+        this.timer.hide()
+
+        // Weather and day cycles
         this.game.weather.override.end()
         this.game.dayCycles.override.end()
+
+        // Checkpoints
+        this.checkpoints.doorReached.mesh.visible = false
+        this.checkpoints.doorTarget.mesh.visible = false
+
+        // Starting lights
+        this.startingLights.reset()
     }
 
     update()
     {
-        const playerPosition = new THREE.Vector2(
-            this.game.player.position.x,
-            this.game.player.position.z
-        )
-
         // Road glitters
         this.road.glitterPositionDelta.value = (this.game.view.camera.position.x + this.game.view.camera.position.z) * this.road.glitterPositionMultiplier
 
@@ -543,15 +692,13 @@ export default class Circuit
                 checkpoint.a.y,
                 checkpoint.b.x,
                 checkpoint.b.y,
-                playerPosition.x,
-                playerPosition.y,
+                this.game.player.position2.x,
+                this.game.player.position2.y,
                 this.checkpoints.checkRadius
             )
 
             if(intersections.length)
-            {
                 checkpoint.reach()
-            }
         }
 
         // Timer

@@ -460,14 +460,13 @@ export class InteractivePoints
 
     update()
     {
-        const playerPosition2 = new THREE.Vector2(this.game.player.position.x, this.game.player.position.z)
-        this.playerPosition.value.copy(playerPosition2)
+        this.playerPosition.value.copy(this.game.player.position2)
 
         let distance = Infinity
         let activeItem = null
         for(const item of this.items)
         {
-            const itemDistance = Math.hypot(item.position.x - playerPosition2.x, item.position.y - playerPosition2.y)
+            const itemDistance = Math.hypot(item.position.x - this.game.player.position2.x, item.position.y - this.game.player.position2.y)
             const isIn = itemDistance < 2.5
             
             if(isIn)

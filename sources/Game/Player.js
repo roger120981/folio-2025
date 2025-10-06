@@ -24,6 +24,7 @@ export class Player
 
         this.position = respawn.position.clone()
         this.basePosition = this.position.clone()
+        this.position2 = new THREE.Vector2(this.position.x, this.position.z)
         this.rotationY = 0
         
         this.setInputs()
@@ -290,9 +291,10 @@ export class Player
     {
         // Position
         this.position.copy(this.game.physicalVehicle.position)
+        this.position2 = new THREE.Vector2(this.position.x, this.position.z)
         
         // Reset on fall
-        if(this.position.y < -2)
+        if(this.position.y < -5)
             this.game.physicalVehicle.moveTo(this.basePosition)
 
         // View > Focus point
