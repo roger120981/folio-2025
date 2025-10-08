@@ -1322,7 +1322,7 @@ export class Projects
         })
 
         // Inputs filters
-        this.game.inputs.filters.delete('playing')
+        this.game.inputs.filters.delete('wandering')
         this.game.inputs.filters.add('cinematic')
 
         // View cinematic
@@ -1379,7 +1379,7 @@ export class Projects
 
         // Input filters
         this.game.inputs.filters.delete('cinematic')
-        this.game.inputs.filters.add('playing')
+        this.game.inputs.filters.add('wandering')
 
         // View cinematic
         this.game.view.cinematic.end()

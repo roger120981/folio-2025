@@ -43,6 +43,7 @@ export default class Circuit
         this.setRails()
         this.setInteractivePoint()
         this.setStartAnimation()
+        this.setRespawn()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -299,6 +300,7 @@ export default class Circuit
         this.checkpoints.count = 0
         this.checkpoints.checkRadius = 2
         this.checkpoints.target = null
+        this.checkpoints.last = null
         this.checkpoints.reachedCount = 0
 
         // Create checkpoints
@@ -316,7 +318,14 @@ export default class Circuit
             checkpoint.position = baseCheckpoint.position.clone()
             checkpoint.rotation = baseCheckpoint.rotation.y
             checkpoint.scale = baseCheckpoint.scale.x * 0.5
-
+            
+            // Respawn position
+            checkpoint.respawnPosition = baseCheckpoint.position.clone()
+            const direction = new THREE.Vector2(3, 0)
+            direction.rotateAround(new THREE.Vector2(), checkpoint.rotation)
+            checkpoint.respawnPosition.x += direction.y
+            checkpoint.respawnPosition.y = 4
+            checkpoint.respawnPosition.z += direction.x
 
             // Center
             checkpoint.center = new THREE.Vector2(checkpoint.position.x, checkpoint.position.z)
@@ -379,7 +388,8 @@ export default class Circuit
                 this.checkpoints.doorReached.mesh.rotation.y = checkpoint.rotation
                 this.checkpoints.doorReached.mesh.scale.x = checkpoint.scale
                 
-                // Update reach and targets
+                // Update reach count and last
+                this.checkpoints.last = checkpoint
                 this.checkpoints.reachedCount++
 
                 // Final checkpoint (start line)
@@ -394,7 +404,6 @@ export default class Circuit
                     const newTarget = this.checkpoints.items[this.checkpoints.reachedCount % (this.checkpoints.count + 1)]
                     newTarget.setTarget()
                 }
-                
                 
                 // No more target
                 this.checkpoints.target
@@ -614,6 +623,55 @@ export default class Circuit
         }
     }
 
+    setRespawn()
+    {
+        this.game.inputs.addActions([
+            { name: 'circuitRespawn', categories: [ 'racing' ], keys: [ 'Keyboard.KeyR', 'Gamepad.select' ] },
+        ])
+
+        // Reset
+        this.game.inputs.events.on('circuitRespawn', (action) =>
+        {
+            if(action.active && this.state === Circuit.STATE_RUNNING)
+            {
+                // Player > Lock
+                this.game.player.state = Player.STATE_LOCKED
+
+                // Respawn position and rotation
+                const position = new THREE.Vector3()
+                let rotation = 0
+
+                if(this.checkpoints.last)
+                {
+                    position.copy(this.checkpoints.last.respawnPosition)
+                    rotation = this.checkpoints.last.rotation + Math.PI * 0.5
+                }
+                else
+                {
+                    position.copy(this.startPosition.position)
+                    rotation = this.startPosition.rotation
+                }
+            
+                this.game.overlay.show(() =>
+                {
+                    // Player > Unlock
+                    gsap.delayedCall(2, () =>
+                    {
+                        this.game.player.state = Player.STATE_DEFAULT
+                    })
+
+                    // Update physical vehicle
+                    this.game.physicalVehicle.moveTo(
+                        position,
+                        rotation
+                    )
+                    
+                    this.game.overlay.hide()
+                })
+            }
+        })
+    }
+
     restart()
     {
         if(this.state === Circuit.STATE_STARTING)
@@ -624,6 +682,10 @@ export default class Circuit
 
         // Player > Lock
         this.game.player.state = Player.STATE_LOCKED
+
+        // Inputs filters
+        this.game.inputs.filters.clear()
+        this.game.inputs.filters.add('racing')
 
         // Overlay > Show
         this.game.overlay.show(() =>
@@ -644,6 +706,7 @@ export default class Circuit
             this.checkpoints.items[0].setTarget()
 
             this.checkpoints.reachedCount = 0
+            this.checkpoints.last = null
 
             // Objects
             this.objects.reset()
@@ -725,13 +788,16 @@ export default class Circuit
             {
                 // State
                 this.state = Circuit.STATE_PENDING
+
+                // Inputs filters
+                this.game.inputs.filters.clear()
+                this.game.inputs.filters.add('wandering')
                 
                 // Update physical vehicle
-                this.game.physicalVehicle.moveTo(
-                    this.startPosition.position,
-                    this.startPosition.rotation
-                )
-
+                const respawn = this.game.respawns.getByName('circuit')
+                if(respawn)
+                    this.game.physicalVehicle.moveTo(respawn.position, respawn.rotation)
+        
                 // Weather and day cycles
                 this.game.weather.override.end(0)
                 this.game.dayCycles.override.end(0)
@@ -779,7 +845,7 @@ export default class Circuit
         for(const obstacle of this.obstacles.items)
         {
             const newPosition = obstacle.basePosition.clone()
-            const osciliation = Math.sin(this.timer.elapsedTime * 1.25 + obstacle.osciliationOffset) * 3.5
+            const osciliation = Math.sin(this.timer.elapsedTime * 1.25 + obstacle.osciliationOffset) * 5
             newPosition.z += osciliation
             
             obstacle.object.physical.body.setNextKinematicTranslation(newPosition)

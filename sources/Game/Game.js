@@ -124,7 +124,7 @@ export class Game
         this.server = new Server()
         this.ticker = new Ticker()
         this.time = new Time()
-        this.inputs = new Inputs([], [ 'playing' ])
+        this.inputs = new Inputs([], [ 'wandering' ])
         this.rayCursor = new RayCursor()
         this.viewport = new Viewport(this.domElement)
         this.modals = new Modals()

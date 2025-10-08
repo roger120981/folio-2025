@@ -10,8 +10,8 @@ export class ClosingManager
         this.game = Game.getInstance()
 
         this.game.inputs.addActions([
-            { name: 'close', categories: [ 'modal', 'cinematic', 'playing' ], keys: [ 'Keyboard.Escape', 'Gamepad.cross' ] },
-            { name: 'pause', categories: [ 'modal', 'cinematic', 'playing' ], keys: [ 'Keyboard.KeyP', 'Gamepad.start' ] }
+            { name: 'close', categories: [ 'modal', 'cinematic', 'wandering' ], keys: [ 'Keyboard.Escape', 'Gamepad.cross' ] },
+            { name: 'pause', categories: [ 'modal', 'cinematic', 'wandering' ], keys: [ 'Keyboard.KeyP', 'Gamepad.start' ] }
         ])
         
         this.game.inputs.events.on('close', (action) =>

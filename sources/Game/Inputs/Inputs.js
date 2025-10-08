@@ -129,7 +129,7 @@ export class Inputs
     {
         this.nipple = new Nipple()
         this.addActions([
-            { name: 'rayPointer', categories: [ 'playing' ], keys: [ 'Pointer.any' ] },
+            { name: 'rayPointer', categories: [ 'wandering' ], keys: [ 'Pointer.any' ] },
         ])
 
         this.events.on('rayPointer', (action) =>

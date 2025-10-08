@@ -258,8 +258,8 @@ export class View
         this.zoom.toggleLast = -1
 
         this.game.inputs.addActions([
-            { name: 'zoom',    categories: [ 'playing' ], keys: [ 'Wheel.roll' ] },
-            { name: 'zoomToggle',  categories: [ 'playing' ], keys: [ 'Gamepad.r3' ] },
+            { name: 'zoom',    categories: [ 'wandering' ], keys: [ 'Wheel.roll' ] },
+            { name: 'zoomToggle',  categories: [ 'wandering' ], keys: [ 'Gamepad.r3' ] },
         ])
 
         this.game.inputs.events.on('zoom', (action) =>
@@ -546,7 +546,7 @@ export class View
     setMapControls()
     {
         this.game.inputs.addActions([
-            { name: 'viewMapPointer', categories: [ 'playing' ], keys: [ 'Pointer.any' ] },
+            { name: 'viewMapPointer', categories: [ 'wandering' ], keys: [ 'Pointer.any' ] },
         ])
 
         this.game.inputs.events.on('viewMapPointer', (action) =>

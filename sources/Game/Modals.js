@@ -163,7 +163,7 @@ export class Modals
 
         this.state = Modals.CLOSING
         this.game.inputs.filters.clear()
-        this.game.inputs.filters.add('playing')
+        this.game.inputs.filters.add('wandering')
         this.current.events.trigger('close')
     }
 
