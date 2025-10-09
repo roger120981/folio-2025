@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu'
 import { Game } from './Game.js'
 
 
-import { If, vec2, vec3, abs, sqrt, vec4, mod, Fn, dot, sin, fract, length, mul, min, float, uv, floor, ceil, smoothstep, int, mix, Loop, texture } from 'three/tsl';
+import { If, vec2, vec3, abs, sqrt, vec4, mod, Fn, dot, sin, fract, length, mul, min, float, uv, floor, ceil, smoothstep, int, mix, Loop, texture, viewportCoordinate, viewportUV } from 'three/tsl';
 
 const hash = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
@@ -163,14 +163,14 @@ export class Noises
         // helperMesh2.position.y = 5
         // this.game.scene.add(helperMesh2)
 
-        // const helperMesh3 = new THREE.Mesh(
-        //     new THREE.BoxGeometry(5, 5, 5),
-        //     new THREE.MeshBasicNodeMaterial({ outputNode: vec4(texture(this.hash).r, 0, 0, 1) })
-        // )
-        // helperMesh3.position.x = 10
-        // helperMesh3.position.y = 5
+        const helperMesh3 = new THREE.Mesh(
+            new THREE.BoxGeometry(5, 5, 5),
+            new THREE.MeshBasicNodeMaterial({ outputNode: vec4(texture(this.hash).r, 0, 0, 1) })
+        )
+        helperMesh3.position.x = 10
+        helperMesh3.position.y = 5
 
-        // this.game.scene.add(helperMesh3)
+        this.game.scene.add(helperMesh3)
     }
 
 	setVoronoi()
@@ -272,7 +272,7 @@ export class Noises
         const material = new THREE.MeshBasicNodeMaterial()
 
         material.outputNode = vec4(
-            hash(uv().mul(128).floor().div(128)).x,
+            hash(viewportUV).x,
             0,
 			0,
 			0

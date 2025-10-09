@@ -23,6 +23,7 @@ export class View
         
         this.mode = View.MODE_DEFAULT
         this.position = new THREE.Vector3()
+        this.delta = new THREE.Vector3()
         this.idealRatio = idealRatio
         this.ratioOverflow = Math.max(1, this.idealRatio / this.game.viewport.ratio) - 1
 
@@ -654,6 +655,7 @@ export class View
         this.position.copy(this.focusPoint.smoothedPosition).add(this.spherical.offset)
 
         // Default camera position
+        this.delta = this.position.clone().sub(this.defaultCamera.position)
         this.defaultCamera.position.copy(this.position)
 
         // Default camera look at and roll

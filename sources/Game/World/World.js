@@ -41,7 +41,7 @@ export class World
         this.rain = new RainLines()
         this.lightnings = new Lightnings()
         this.fireballs = new Fireballs()
-        // this.snow = new Snow()
+        this.snow = new Snow()
         this.whispers = new Whispers()
         this.tornado = new Tornado()
         this.bushes = new Bushes()

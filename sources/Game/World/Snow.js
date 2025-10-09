@@ -98,6 +98,7 @@ export class Snow
             { label: 'elevation', min: -1, max: 1, step: 0.001 },
             () =>
             {
+                return 1
                 const elevationStrength = this.game.weather.snow.value * Math.max(this.game.dayCycles.progressDelta, 0) * 10
 
                 let newElevation = this.elevation.value + elevationStrength
@@ -248,15 +249,7 @@ export class Snow
         this.fadeEdgeHigh = uniform(0.5)
         this.fadeEdgeLow = uniform(0.022)
         this.normalNeighbourShift = uniform(0.2)
-        // this.glittersProgress = uniform(0)
-        // this.glittersPositionFrequency = uniform(20)
-        // this.glittersVariationFrequency = uniform(0.0001)
-        // this.glittersScarcity = uniform(0.0004)
-        // this.glittersStrength = uniform(3)
-        this.glitterPositionMultiplier = 0.000003
-        this.glitterPositionDelta = uniform(0)
-        this.glitterScarcity = uniform(0.0005)
-        this.glitterLighten = uniform(0.2)
+        
 
         const deltaY = varying(float())
         const worldUv = varying(vec2())
@@ -351,27 +344,37 @@ export class Snow
 
         const baseOutput = this.material.outputNode
         
+        this.glitterViewMultiplier = 0.0004
+        this.glitterTimeMultiplier = 0.0004
+        this.glitterVariation = uniform(0)
+        this.glitterScarcity = uniform(1000)
+        this.glitterIntensity = uniform(2)
+        this.glitterPerlinFrequency = uniform(0.05)
+        this.glitterHashFrequency = uniform(0.2)
+
         this.material.outputNode = Fn(() =>
         {
-            // Glitter
-            // const glittersUv = worldUv.mul(this.glittersFrequency)
-            // const glittersUvLoop = glittersUv.fract()
+            const glitter = float(0)
 
-            // const noiseUv = worldUv.div(128).mul(this.glittersPositionFrequency)
-            // const glittersRandom1 = texture(this.game.noises.hash, noiseUv).r
-            // const glittersRandom2 = texture(this.game.noises.hash, noiseUv.add(0.5)).r
-            // const glittersProgress = this.glittersProgress.mul(this.glittersVariationFrequency)
-            // const glittersStrength = glittersProgress.sub(glittersRandom1).fract().sub(0.5).abs().remapClamp(0, this.glittersScarcity, 1, 0).toVar()
+            // Hash
+            const hashUv = positionWorld.xz.mul(this.glitterHashFrequency)
+            const hash = texture(this.game.noises.hash, hashUv).r.mul(2).add(this.glitterVariation).mod(2).sub(1).abs()
+            glitter.addAssign(hash)
 
-            // const glittersShape = glittersUvLoop.sub(0.5).length()
-            // glittersShape.assign(step(glittersShape, glittersRandom2.mul(0.5)))
-            // glittersStrength.mulAssign(glittersShape.mul(this.glittersStrength))
-
-            const glittersUv = positionWorld.xz.mul(0.2)
-            const glitter = texture(this.game.noises.hash, glittersUv).r
-            const glitterLighten = this.glitterPositionDelta.add(glitter).fract().sub(0.5).abs().mul(2).remapClamp(0.9999, 1, 0, 1)
+            // Perlin
+            const perlinUv = positionWorld.xz.mul(this.glitterPerlinFrequency)
+            const perlin = texture(this.game.noises.perlin, perlinUv).r
+            const glitterPerlin = perlin.remapClamp(0, 0.5, 0, 1)
+            glitter.mulAssign(glitterPerlin)
             
-            return vec4(baseOutput.rgb.add(glitterLighten), baseOutput.a)
+            // Scarcity
+            glitter.assign(glitter.pow(this.glitterScarcity))
+
+            // Intensity
+            glitter.mulAssign(this.glitterIntensity)
+
+            // Output
+            return vec4(baseOutput.rgb.add(glitter), baseOutput.a)
         })()
 
         // Debug
@@ -396,6 +399,13 @@ export class Snow
             // this.debugPanel.addBinding(this.glittersVariationFrequency, 'value', { label: 'glittersVariationFrequency', min: 0, max: 0.001, step: 0.000001 })
             // this.debugPanel.addBinding(this.glittersScarcity, 'value', { label: 'glittersScarcity', min: 0, max: 0.01, step: 0.000001 })
             // this.debugPanel.addBinding(this.glittersStrength, 'value', { label: 'glittersStrength', min: 0, max: 10, step: 0.001 })
+
+            this.debugPanel.addBinding(this, 'glitterViewMultiplier', { min: 0, max: 0.001, step: 0.000001 })
+            this.debugPanel.addBinding(this, 'glitterTimeMultiplier', { min: 0, max: 0.001, step: 0.000001 })
+            this.debugPanel.addBinding(this.glitterScarcity, 'value', { label: 'glitterScarcity', min: 100, max: 10000, step: 1 })
+            this.debugPanel.addBinding(this.glitterIntensity, 'value', { label: 'glitterIntensity', min: 0, max: 10, step: 0.01 })
+            this.debugPanel.addBinding(this.glitterPerlinFrequency, 'value', { label: 'glitterPerlinFrequency', min: 0, max: 0.1, step: 0.0001 })
+            this.debugPanel.addBinding(this.glitterHashFrequency, 'value', { label: 'glitterHashFrequency', min: 0, max: 1, step: 0.0001 })
         }
     }
 
@@ -414,9 +424,13 @@ export class Snow
         this.elevationBinding.update()
 
         // Glitter
-        // this.glitterPositionDelta.value = 1 + (this.game.view.camera.position.x + this.game.view.camera.position.z) * this.glitterPositionMultiplier + this.game.ticker.elapsedScaled * 0.4
-        this.glitterPositionDelta.value = 123.456 + (this.game.view.camera.position.x + this.game.view.camera.position.z) * this.glitterPositionMultiplier
+        // this.glitterPositionDelta.value = 1 + (this.game.view.camera.position.x + this.game.view.camera.position.z) * this.glitterViewMultiplier + this.game.ticker.elapsedScaled * 0.4
+        // this.glitterPositionDelta.value = 123.456 + (this.game.view.camera.position.x + this.game.view.camera.position.z) * this.glitterViewMultiplier
         
+        // this.glitterViewMultiplier = 0.001
+        // this.glitterTimeMultiplier = 0.001
+        this.glitterVariation.value += this.game.ticker.deltaScaled * this.glitterTimeMultiplier + this.game.view.delta.length() * this.glitterViewMultiplier
+
         // Rounded position
         this.roundedPosition.value.x = Math.round(this.game.view.optimalArea.position.x / this.subdivisionSize) * this.subdivisionSize
         this.roundedPosition.value.y = Math.round(this.game.view.optimalArea.position.z / this.subdivisionSize) * this.subdivisionSize
