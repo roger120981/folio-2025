@@ -241,7 +241,6 @@ export class Whispers
         this.modal.input = this.modal.inputGroup.querySelector('.js-input')
         this.modal.previewMessage = this.modal.container.querySelector('.js-preview-message')
         this.modal.previewMessageText = this.modal.previewMessage.querySelector('.js-text')
-        this.modal.offline = this.modal.container.querySelector('.js-offline')
 
         const sanatize = (text = '', trim = false, limit = false, stripEmojis = false) =>
         {
@@ -330,20 +329,14 @@ export class Whispers
             updateGroup()
             this.modal.closeFlagSelect()
         })
-
-        // Server connect / disconnect
-        if(this.game.server.connected)
-            this.modal.offline.style.display = 'none'
             
         this.game.server.events.on('connected', () =>
         {
-            this.modal.offline.style.display = 'none'
             updateGroup()
         })
 
         this.game.server.events.on('disconnected', () =>
         {
-            this.modal.offline.style.display = 'block'
             updateGroup()
         })
 

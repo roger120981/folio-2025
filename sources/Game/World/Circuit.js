@@ -47,9 +47,11 @@ export default class Circuit
         this.setBounds()
         this.setAirDancers()
         this.setBanners()
+        this.setModal()
         this.setLeaderboard()
-        this.setLeaderboardReset()
+        this.setResetTime()
         this.setPodium()
+        this.setData()
 
         this.game.materials.getFromName('circuitBrand').map.minFilter = THREE.LinearFilter
         this.game.materials.getFromName('circuitBrand').map.magFilter = THREE.LinearFilter
@@ -793,7 +795,6 @@ export default class Circuit
         canvas.width = resolution
         canvas.height = resolution
 
-
         // Texture
         const textTexture = new THREE.Texture(canvas)
         textTexture.minFilter = THREE.NearestFilter
@@ -832,61 +833,74 @@ export default class Circuit
             { align: 'left', x: resolution * 0.625 },
         ]
         const interline = resolution / 12
-        this.leaderboard.draw = (scores = []) =>
+        this.leaderboard.draw = (scores = null) =>
         {
             // Clear
             context.fillStyle = '#000000'
             context.fillRect(0, 0, canvas.width, canvas.height)
 
-            context.font = font
-            context.fillStyle = '#ffffff'
-            context.textBaseline = 'middle'
-
-            let rank = 1
-            for(const score of scores)
+            if(scores === null)
             {
-                context.textAlign = columsSettings[0].align
-                context.fillText(rank, columsSettings[0].x, (rank + 0.5) * interline)
+                context.font = font
+                context.fillStyle = '#ff87a2'
+                context.textBaseline = 'middle'
+                context.textAlign = 'center'
+                context.fillText('OFFLINE', resolution * 0.5, resolution * 0.5)
+            }
+            else
+            {
+                context.font = font
+                context.fillStyle = '#ffffff'
+                context.textBaseline = 'middle'
 
-                context.textAlign = columsSettings[1].align
-                context.fillText(score[0], columsSettings[1].x, (rank + 0.5) * interline)
+                let rank = 1
+                for(const score of scores)
+                {
+                    context.textAlign = columsSettings[0].align
+                    context.fillText(rank, columsSettings[0].x, (rank + 0.5) * interline)
 
-                context.textAlign = columsSettings[2].align
-                context.fillText(score[1], columsSettings[2].x, (rank + 0.5) * interline)
+                    context.textAlign = columsSettings[1].align
+                    context.fillText(score[0], columsSettings[1].x, (rank + 0.5) * interline)
 
-                rank++
+                    context.textAlign = columsSettings[2].align
+                    context.fillText(score[1], columsSettings[2].x, (rank + 0.5) * interline)
+
+                    rank++
+                }
             }
             textTexture.needsUpdate = true
         }
 
-        this.leaderboard.draw([
-            [ 'BRU', '00:25:150' ],
-            [ 'TTU', '00:27:153' ],
-            [ 'ORS', '00:27:002' ],
-            [ 'BAB', '00:29:193' ],
-            [ 'YOH', '00:30:159' ],
-            [ 'PUH', '00:37:103' ],
-            [ 'WWW', '00:40:253' ],
-            [ 'PWT', '00:41:315' ],
-            [ 'PRT', '00:45:035' ],
-            [ 'BOO', '00:49:531' ],
-        ])
+        this.leaderboard.draw(null)
+        // this.leaderboard.draw([
+        //     [ 'BRU', '00:25:150' ],
+        //     [ 'TTU', '00:27:153' ],
+        //     [ 'ORS', '00:27:002' ],
+        //     [ 'BAB', '00:29:193' ],
+        //     [ 'YOH', '00:30:159' ],
+        //     [ 'PUH', '00:37:103' ],
+        //     [ 'WWW', '00:40:253' ],
+        //     [ 'PWT', '00:41:315' ],
+        //     [ 'PRT', '00:45:035' ],
+        //     [ 'BOO', '00:49:531' ],
+        // ])
     }
 
-    setLeaderboardReset()
+    setResetTime()
     {
-        this.leaderboardReset = {}
-        this.leaderboardReset.isActive = false
-        this.leaderboardReset.interval = null
-        this.leaderboardReset.resetTime = null
-        this.leaderboardReset.lastTimeToReset = null
-        this.leaderboardReset.lastTimeDrawn = null
+        this.resetTime = {}
+        this.resetTime.isActive = false
+        this.resetTime.interval = null
+        this.resetTime.resetTime = null
+        this.resetTime.lastTimeToReset = null
+        this.resetTime.finalFormatedTime = null
+        this.resetTime.lastTimeDrawn = null
 
-        const width = 256
-        const height = 64
+        const width = 128
+        const height = 32
 
         // Canvas
-        const font = `700 ${35}px "Nunito"`
+        const font = `700 ${35 / 2}px "Nunito"`
 
         const canvas = document.createElement('canvas')
         canvas.style.position = 'fixed'
@@ -907,9 +921,7 @@ export default class Circuit
         textTexture.magFilter = THREE.NearestFilter
         textTexture.generateMipmaps = false
 
-        // Digits
-        // const geometry = new THREE.PlaneGeometry(this.timer.digits.ratio, 1)
-
+        // Material
         const material = new MeshDefaultMaterial({
             colorNode: color('#463F35'),
             hasWater: false,
@@ -954,52 +966,63 @@ export default class Circuit
             return parts.join(' ')
         }
 
-        this.leaderboardReset.activate = (resetTime = 0) =>
+        this.resetTime.activate = (resetTime = 0) =>
         {
-            this.leaderboardReset.isActive = true
-            this.leaderboardReset.resetTime = resetTime
+            this.resetTime.isActive = true
+            this.resetTime.resetTime = resetTime
 
-            this.leaderboardReset.interval = setInterval(this.leaderboardReset.tryDraw, 1000)
-            this.leaderboardReset.tryDraw()
+            this.resetTime.interval = setInterval(this.resetTime.tryDraw, 1000)
+            this.resetTime.tryDraw()
+        }
+
+        this.resetTime.deactivate = () =>
+        {
+            this.resetTime.isActive = true
+            this.resetTime.lastTimeDrawn = null
+            clearInterval(this.resetTime.interval)
+            this.resetTime.draw(null)
         }
 
         const dayDuration = 24 * 60 * 60 * 1000
 
-        this.leaderboardReset.tryDraw = () =>
+        this.resetTime.tryDraw = () =>
         {
-            const timeToReset = dayDuration - (Date.now() - this.leaderboardReset.resetTime) % dayDuration
+            const timeToReset = dayDuration - (Date.now() - this.resetTime.resetTime) % dayDuration
 
             const formatedTime = timeToString(timeToReset)
 
-            if(formatedTime !== this.leaderboardReset.lastTimeDrawn)
+            if(formatedTime !== this.resetTime.lastTimeDrawn)
             {
-                this.leaderboardReset.draw(`in ${formatedTime}`)
-                this.leaderboardReset.lastTimeDrawn = formatedTime
+                this.resetTime.lastTimeDrawn = formatedTime
+
+                this.resetTime.finalFormatedTime = formatedTime === '' ? 'now' : `in ${formatedTime}`
+                this.resetTime.draw(this.resetTime.finalFormatedTime)
+
+                if(this.modal.instance.isOpen)
+                    this.modal.resetTimeElement.textContent = this.resetTime.finalFormatedTime
             }
 
-            this.leaderboardReset.lastTimeToReset = timeToReset
+            this.resetTime.lastTimeToReset = timeToReset
         }
 
-        this.leaderboardReset.draw = (text = '') =>
+        this.resetTime.draw = (text = null) =>
         {
             // Clear
             context.fillStyle = '#000000'
             context.fillRect(0, 0, canvas.width, canvas.height)
 
             // Draw text
-            context.fillStyle = '#ffffff'
-            context.textAlign = 'center'
-            context.textBaseline = 'middle'
-            context.font = font
-            context.fillText(text, canvas.width * 0.5, canvas.height * 0.5)
+            if(text !== null)
+            {
+                context.fillStyle = '#ffffff'
+                context.textAlign = 'center'
+                context.textBaseline = 'middle'
+                context.font = font
+                context.fillText(text, canvas.width * 0.5, canvas.height * 0.5)
+            }
 
             textTexture.needsUpdate = true
         }
-
-        const resetDate = new Date('2024/01/01 15:28:00')
-        const resetTime = resetDate.getTime() % dayDuration
-
-        this.leaderboardReset.activate(resetTime)
     }
 
     setPodium()
@@ -1052,6 +1075,51 @@ export default class Circuit
         }
 
         this.podium.hide()
+    }
+
+    setModal()
+    {
+        this.modal = {}
+        this.modal.instance = this.game.modals.items.get('circuit')
+        this.modal.resetTimeElement = this.modal.instance.element.querySelector('.js-reset-time')
+        
+        // Restart button
+        const restartElement = this.modal.instance.element.querySelector('.js-button-restart')
+        restartElement.addEventListener('click', (event) =>
+        {
+            event.preventDefault()
+
+            this.restart()
+            this.game.modals.close()
+        })
+
+        // End button
+        const endElement = this.modal.instance.element.querySelector('.js-button-end')
+        endElement.addEventListener('click', (event) =>
+        {
+            event.preventDefault()
+
+            if(this.state === Circuit.STATE_RUNNING || this.state === Circuit.STATE_STARTING)
+                this.finish(true)
+            
+            this.game.modals.close()
+        })
+
+        // Controls button
+        const controlsElement = this.modal.instance.element.querySelector('.js-button-controls')
+        controlsElement.addEventListener('click', (event) =>
+        {
+            event.preventDefault()
+            
+            this.game.modals.open('controls')
+        })
+
+        // Reset time
+        this.modal.instance.events.on('open', () =>
+        {
+            if(this.resetTime.finalFormatedTime)
+                this.modal.resetTimeElement.textContent = this.resetTime.finalFormatedTime
+        })
     }
 
     restart()
@@ -1157,6 +1225,56 @@ export default class Circuit
 
             })
         })
+    }
+
+    setData()
+    {
+        // Server message event
+        this.game.server.events.on('message', (data) =>
+        {
+            // Init and insert
+            if(data.type === 'init')
+            {
+                this.resetTime.activate(data.circuitResetTime)
+                this.leaderboard.draw([
+                    [ 'BRU', '00:25:150' ],
+                    [ 'TTU', '00:27:153' ],
+                    [ 'ORS', '00:27:002' ],
+                    [ 'BAB', '00:29:193' ],
+                    [ 'YOH', '00:30:159' ],
+                    [ 'PUH', '00:37:103' ],
+                    [ 'WWW', '00:40:253' ],
+                    [ 'PWT', '00:41:315' ],
+                    [ 'PRT', '00:45:035' ],
+                    [ 'BOO', '00:49:531' ],
+                ])
+            }
+        })
+
+        // Server disconnected
+        this.game.server.events.on('disconnected', () =>
+        {
+            this.resetTime.deactivate()
+            this.leaderboard.draw(null)
+        })
+
+        // Message already received
+        if(this.game.server.initData)
+        {
+            this.resetTime.activate(this.game.server.initData.circuitResetTime)
+            this.leaderboard.draw([
+                [ 'BRU', '00:25:150' ],
+                [ 'TTU', '00:27:153' ],
+                [ 'ORS', '00:27:002' ],
+                [ 'BAB', '00:29:193' ],
+                [ 'YOH', '00:30:159' ],
+                [ 'PUH', '00:37:103' ],
+                [ 'WWW', '00:40:253' ],
+                [ 'PWT', '00:41:315' ],
+                [ 'PRT', '00:45:035' ],
+                [ 'BOO', '00:49:531' ],
+            ])
+        }
     }
 
     finish(forced = false)

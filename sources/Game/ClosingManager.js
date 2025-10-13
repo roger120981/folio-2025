@@ -1,5 +1,6 @@
 import { Game } from './Game.js'
 import { Modals } from './Modals.js'
+import Circuit from './World/Circuit.js'
 import { Lab } from './World/Lab.js'
 import { Projects } from './World/Projects.js'
 
@@ -10,8 +11,8 @@ export class ClosingManager
         this.game = Game.getInstance()
 
         this.game.inputs.addActions([
-            { name: 'close', categories: [ 'modal', 'cinematic', 'wandering' ], keys: [ 'Keyboard.Escape', 'Gamepad.cross' ] },
-            { name: 'pause', categories: [ 'modal', 'cinematic', 'wandering' ], keys: [ 'Keyboard.KeyP', 'Gamepad.start' ] }
+            { name: 'close', categories: [ 'modal', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.Escape', 'Gamepad.cross' ] },
+            { name: 'pause', categories: [ 'modal', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.KeyP', 'Gamepad.start' ] }
         ])
         
         this.game.inputs.events.on('close', (action) =>
@@ -24,9 +25,11 @@ export class ClosingManager
                 
                 // Modal open => Close
                 else if(this.game.modals.state === Modals.OPEN)
-                {
                     this.game.modals.close()
-                }
+
+                // Circuit running
+                else if(this.game.world.areas?.circuit?.state === Circuit.STATE_RUNNING || this.game.world.areas?.circuit?.state === Circuit.STATE_STARTING)
+                    this.game.modals.open('circuit')
 
                 // Projects => Close
                 else if(this.game.world.areas?.projects?.state === Projects.STATE_OPEN)

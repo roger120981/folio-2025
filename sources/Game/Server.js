@@ -17,6 +17,7 @@ export class Server
         this.connected = false
         this.initData = null
         this.events = new Events()
+        document.documentElement.classList.add('is-server-offline')
 
         if(import.meta.env.VITE_SERVER_CONNECT)
         {
@@ -40,6 +41,8 @@ export class Server
         this.socket.addEventListener('open', () =>
         {
             this.connected = true
+            document.documentElement.classList.remove('is-server-offline')
+            document.documentElement.classList.add('is-server-online')
             this.events.trigger('connected')
 
             // On message
@@ -51,6 +54,8 @@ export class Server
             // On close
             this.socket.addEventListener('close', () =>
             {
+                document.documentElement.classList.add('is-server-offline')
+                document.documentElement.classList.remove('is-server-online')
                 this.connected = false
                 this.events.trigger('disconnected')
             })

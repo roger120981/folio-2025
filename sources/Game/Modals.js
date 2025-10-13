@@ -70,6 +70,7 @@ export class Modals
             const item = {
                 name: name,
                 element: element,
+                isOpen: false,
                 tabs: null,
                 mainFocus: element.querySelector('.js-main-focus'),
                 events: new Events()
@@ -149,6 +150,7 @@ export class Modals
             this.game.inputs.filters.clear()
             this.game.inputs.filters.add('modal')
 
+            item.isOpen = true
             item.events.trigger('open')
         }
 
@@ -164,6 +166,7 @@ export class Modals
         this.state = Modals.CLOSING
         this.game.inputs.filters.clear()
         this.game.inputs.filters.add('wandering')
+        this.current.isOpen = false
         this.current.events.trigger('close')
     }
 
