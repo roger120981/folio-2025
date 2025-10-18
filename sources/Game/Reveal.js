@@ -41,67 +41,74 @@ export class Reveal
         const _center = center instanceof THREE.Vector2 ? center : new THREE.Vector2(this.game.player.position.x, this.game.player.position.z)
         this.center.value.copy(_center)
 
-        // Distance
+        // Timeline
+        const timeline = gsap.timeline()
+        timeline.timeScale(this.game.debug.active ? 4 : 1)
+
+        // Reveal distance (used as base for the whole animation)
         this.distance.value = 0
-        
-        gsap.to(
-            this.distance,
-            {
+
+        timeline.addLabel('a')
+        timeline.to(
+            this.distance, {
                 value: 9,
                 ease: 'power3.out',
-                duration: 3,
-                onComplete: () =>
-                {
-                    gsap.to(
-                        this.distance,
-                        {
-                            value: 30,
-                            ease: 'back.in(2)',
-                            duration: 1.5,
-                            onComplete: () =>
-                            {
-                                this.distance.value = 99999
-                            }
-                        }
-                    )
-
-                    // gsap.delayedCall(0.75, () =>
-                    // {
-                        // Inputs filters
-                        this.game.inputs.filters.clear()
-                        this.game.inputs.filters.add('wandering')
-                    // })
-                }
+                duration: 3
             }
+        )
+        timeline.addLabel('b')
+        timeline.to(
+            this.distance,
+            {
+                value: 30,
+                ease: 'back.in(2)',
+                duration: 1.5,
+            }
+        )
+        timeline.addLabel('c')
+        timeline.call(
+            () =>
+            {
+                this.distance.value = 99999
+            },
+            []
+        )
+
+        // Inputs
+        timeline.call(
+            () =>
+            {
+                this.game.inputs.filters.clear()
+                this.game.inputs.filters.add('wandering')
+            },
+            [],
+            'b'
         )
 
         // View
         this.game.view.zoom.smoothedRatio = 0.6
         this.game.view.zoom.baseRatio = 0.6
 
-        gsap.to(
+        timeline.to(
             this.game.view.zoom,
             {
                 baseRatio: 0.3,
                 // smoothedRatio: 0.4,
                 ease: 'power1.inOut',
                 duration: 2,
-                onComplete: () =>
-                {
-                    gsap.to(
-                        this.game.view.zoom,
-                        {
-                            baseRatio: 0,
-                            delay: 1,
-                            // smoothedRatio: 0,
-                            ease: 'back.in(1.5)',
-                            duration: 1.5,
-                        }
-                    )
-                }
-            }
+            },
+            'a'
         )
-        // this.game.view.zoom.baseRatio
+        timeline.to(
+            this.game.view.zoom,
+            {
+                baseRatio: 0,
+                // smoothedRatio: 0,
+                ease: 'back.in(1.5)',
+                duration: 1.5,
+            },
+            'b'
+        )
     }
 
     update()

@@ -22,7 +22,6 @@ export class View
         this.game = Game.getInstance()
         
         this.mode = View.MODE_DEFAULT
-        console.log(this.game.respawns.getDefault())
         this.position = new THREE.Vector3()
         this.delta = new THREE.Vector3()
         this.idealRatio = idealRatio
