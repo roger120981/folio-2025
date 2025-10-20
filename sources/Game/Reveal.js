@@ -114,7 +114,7 @@ export class Reveal
         timeline.call(
             () =>
             {
-                this.game.interactivePoints.reveal()
+                // this.game.interactivePoints.reveal()
                 this.game.world.init(2)
             },
             [],
