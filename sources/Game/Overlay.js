@@ -13,7 +13,7 @@ export class Overlay
         const colorA = uniform(color('#251f2b'))
         const colorB = uniform(color('#1d1721'))
         this.progress = uniform(0)
-        this.patternSize = uniform(200)
+        this.patternSize = uniform(200 * this.game.viewport.pixelRatio)
         this.strokeSize = uniform(10)
         this.inverted = uniform(0)
         const diagonalAmplitude = 0.5
@@ -85,6 +85,10 @@ export class Overlay
             debugPanel.addButton({ title: 'show' }).on('click', () => { this.show() })
             debugPanel.addButton({ title: 'hide' }).on('click', () => { this.hide() })
         }
+        this.game.viewport.events.on('change', () =>
+        {
+            this.patternSize.value = 200 * this.game.viewport.pixelRatio
+        })
     }
 
     show(callback)
