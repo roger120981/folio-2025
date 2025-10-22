@@ -15,7 +15,7 @@ export class Respawns
     {
         this.items = new Map()
 
-        for(const child of this.game.resources.respawnsModel.scene.children)
+        for(const child of this.game.resources.respawnsReferencesModel.scene.children)
         {
             child.rotation.reorder('YXZ')
 

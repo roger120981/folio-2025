@@ -66,7 +66,7 @@ export class Game
         // First batch for intro
         this.resourcesLoader = new ResourcesLoader()
         this.resources = await this.resourcesLoader.load([
-            [ 'respawnsModel', 'respawns/respawns.glb', 'gltf' ],
+            [ 'respawnsReferencesModel', 'respawns/respawnsReferences.glb', 'gltf' ],
         ])
         this.scene = new THREE.Scene()
         this.debug = new Debug()
