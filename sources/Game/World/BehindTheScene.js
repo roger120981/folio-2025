@@ -15,7 +15,7 @@ export class BehindTheScene
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: '🔳 Behind the scene',
-                expanded: true,
+                expanded: false,
             })
         }
 
