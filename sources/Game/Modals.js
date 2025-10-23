@@ -103,6 +103,12 @@ export class Modals
                 this.close()
             })
         }
+
+        this.element.addEventListener('click', (event) =>
+        {
+            if(event.target === this.element)
+                this.close()
+        })
     }
 
     open(name)
@@ -157,7 +163,6 @@ export class Modals
             this.events.trigger('open')
             item.events.trigger('open')
         }
-
     }
 
     close()
