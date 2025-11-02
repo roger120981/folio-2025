@@ -275,7 +275,7 @@ export class WaterSurface
          this.blurOutputNode = Fn(() =>
          {
             const blurOutput = boxBlur(viewportSharedTexture(screenUV), {
-				size: 1,
+				size: 1.5,
 				separation: 3
 			}).rgb
 
@@ -308,8 +308,14 @@ export class WaterSurface
         material.outputNode = Fn(() =>
         {
             const blurOutput = this.blurOutputNode()
+            const surfaceAlpha = baseOutput.a
+            const surfaceOutput = vec4(baseOutput.rgb, 1)
 
-            const finalOuput = select(baseOutput.a.lessThan(0.5), blurOutput, baseOutput);
+            const finalOuput = select(
+                surfaceAlpha.lessThan(0.5),
+                blurOutput,
+                surfaceOutput
+            )
 
             return finalOuput
         })()

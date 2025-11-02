@@ -118,6 +118,7 @@ export class Leaves
             colorNode: colorNode,
             normalNode: normalWorld,
             hasWater: false,
+            transparent: true
         })
 
         // Shadow
@@ -282,6 +283,7 @@ export class Leaves
         this.mesh.frustumCulled = false
         this.mesh.castShadow = true
         this.mesh.receiveShadow = true
+        this.mesh.renderOrder = 2
         this.game.scene.add(this.mesh)
     }
 
