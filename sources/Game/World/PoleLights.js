@@ -40,9 +40,26 @@ export class PoleLights
 
         this.glass = this.instancedGroup.meshes.find(mesh => mesh.instance.name === 'glass').instance
         
+        this.setPhysics()
         this.setEmissives()
         this.setFireflies()
         this.setSwitchInterval()
+    }
+
+    setPhysics()
+    {
+        for(const reference of this.references)
+        {
+            this.game.objects.add(
+                null,
+                {
+                    type: 'fixed',
+                    position: reference.position,
+                    rotation: reference.quaternion,
+                    colliders: [ { shape: 'cuboid', parameters: [ 0.2, 1.7, 0.2 ], category: 'object' } ]
+                },
+            )
+        }
     }
 
     setEmissives()
@@ -102,7 +119,6 @@ export class PoleLights
 
         const intervalChange = (inInterval) =>
         {
-            console.log(inInterval)
             if(inInterval)
             {
                 this.glass.material = this.emissive.onMaterial
