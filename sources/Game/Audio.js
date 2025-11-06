@@ -33,7 +33,11 @@ export class Audio
             pool: 2,
             autoplay: options.autoplay ?? false,
             loop: options.loop ?? false,
-            volume: options.volume ?? 0.5
+            volume: options.volume ?? 0.5,
+            onloaderror: () =>
+            {
+                console.error(`Audio > Load error > ${options.path}`, options)
+            }
         })
         item.rate = options.rate ?? 1
         item.volume = options.volume ?? 0.5
@@ -78,7 +82,7 @@ export class Audio
     setMusic()
     {
         this.music = new Howl({
-            src: ['sounds/musics/scarborough-fair-dance_main-full.wav'],
+            src: ['sounds/musics/scarborough-fair-dance_main-full.mp3'],
             pool: 0,
             autoplay: false,
             loop: true,
@@ -91,7 +95,7 @@ export class Audio
         this.register(
             'wind',
             {
-                path: 'sounds/wind/13582-wind-in-forest-loop.wav',
+                path: 'sounds/wind/13582-wind-in-forest-loop.mp3',
                 autoplay: true,
                 loop: true,
                 volume: 0,
@@ -105,7 +109,7 @@ export class Audio
         this.register(
             'rain',
             {
-                path: 'sounds/rain/soundjay_rain-on-leaves_main-01.wav',
+                path: 'sounds/rain/soundjay_rain-on-leaves_main-01.mp3',
                 autoplay: true,
                 loop: true,
                 volume: 0,
@@ -119,7 +123,7 @@ export class Audio
         this.register(
             'waves',
             {
-                path: 'sounds/waves/lake-waves.wav',
+                path: 'sounds/waves/lake-waves.mp3',
                 autoplay: true,
                 loop: true,
                 volume: 0,
@@ -135,9 +139,9 @@ export class Audio
         )
 
         this.register(
-            'wheels',
+            'floor',
             {
-                path: 'sounds/wheels/Source Stone Loop Small Rubbing Pebbles On Rubber 01.wav',
+                path: 'sounds/floor/Source Stone Loop Small Rubbing Pebbles On Rubber 01.mp3',
                 autoplay: true,
                 loop: true,
                 volume: 0,
@@ -154,9 +158,9 @@ export class Audio
         )
 
         this.register(
-            'drift',
+            'floor',
             {
-                path: 'sounds/drift/Source Stone Loop Small Rubbing Pebbles On Concrete 02.wav',
+                path: 'sounds/floor/Source Stone Loop Small Rubbing Pebbles On Concrete 02.mp3',
                 autoplay: true,
                 loop: true,
                 volume: 0,
@@ -181,15 +185,15 @@ export class Audio
         )
 
         this.register(
-            'drift',
+            'floor',
             {
-                path: 'sounds/drift/Earth Loop Dumping Gravel Sack Bulk Falling 01.wav',
+                path: 'sounds/floor/Earth Loop Dumping Gravel Sack Bulk Falling 01.mp3',
                 autoplay: true,
                 loop: true,
                 volume: 0,
                 tickBinding: (item) =>
                 {
-                    item.volume = this.groups.get('drift')[0].volume * 0.5
+                    item.volume = this.groups.get('floor')[0].volume * 0.5
                     
                     item.rate = 1.2
                 }
@@ -199,7 +203,7 @@ export class Audio
         this.register(
             'engine',
             {
-                path: 'sounds/engine/muscle car engine loop idle.wav',
+                path: 'sounds/engine/muscle car engine loop idle.mp3',
                 autoplay: true,
                 loop: true,
                 volume: 0,
@@ -222,7 +226,7 @@ export class Audio
         // this.register(
         //     'energy',
         //     {
-        //         path: 'sounds/energy/Energy_-_force_field_15_loop.wav',
+        //         path: 'sounds/energy/Energy_-_force_field_15_loop.mp3',
         //         autoplay: true,
         //         loop: true,
         //         volume: 0,
@@ -245,7 +249,7 @@ export class Audio
         // this.register(
         //     'energy',
         //     {
-        //         path: 'sounds/energy/Energy_-_force_field_6_loop.wav',
+        //         path: 'sounds/energy/Energy_-_force_field_6_loop.mp3',
         //         autoplay: true,
         //         loop: true,
         //         volume: 0,

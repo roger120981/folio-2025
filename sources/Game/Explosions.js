@@ -14,7 +14,7 @@ export class Explosions
         this.sound = this.game.audio.register(
             'explosion',
             {
-                path: 'sounds/explosions/Explosion with Debris 01.wav',
+                path: 'sounds/explosions/Explosion with Debris 01.mp3',
                 autoplay: false,
                 loop: false,
                 volume: 0.4,
