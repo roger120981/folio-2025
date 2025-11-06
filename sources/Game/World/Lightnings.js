@@ -1,9 +1,10 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { attribute, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, color, cross, float, floor, Fn, instancedArray, min, modelWorldMatrix, mul, positionGeometry, step, uniform, varying, vec3, vec4, vertexIndex } from 'three/tsl'
+import { attribute, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, color, cross, float, floor, Fn, instancedArray, min, modelWorldMatrix, mul, positionGeometry, remapClamp, step, uniform, varying, vec3, vec4, vertexIndex } from 'three/tsl'
 import { LineGeometry } from '../Geometries/LineGeometry.js'
 import gsap from 'gsap'
 import { alea } from 'seedrandom'
+import { remapClamp as mathRemapClamp } from '../utilities/maths.js'
 
 const rng = alea('lightning')
 
@@ -45,6 +46,7 @@ export class Lightnings
 
         this.materialReference = this.game.materials.createEmissive('lightnings', '#4c8bff', 4, this.debugPanel)
 
+        this.setSounds()
         this.setAnticipationParticles()
         this.setArc()
         this.setExplosionParticles()
@@ -53,6 +55,77 @@ export class Lightnings
         {
             this.update()
         })
+    }
+
+    setSounds()
+    {
+        this.sounds = {}
+
+        // Near
+        {
+            const paths = [
+                'sounds/thunder/near/THUNDER_GEN-HDF-23300.mp3',
+                'sounds/thunder/near/Lightning-Streak-with-Thunder-Crash_TTX028903.mp3',
+                'sounds/thunder/near/ThunderSharpStrikingRumblingCrackling_JMDKp_04.mp3'
+            ]
+
+            this.sounds.near = []
+
+            for(const path of paths)
+            {
+                this.sounds.near.push(
+                    this.game.audio.register(
+                        'explosion',
+                        {
+                            path: path,
+                            autoplay: false,
+                            loop: false,
+                            volume: 0.4,
+                            antiSpam: 0.2,
+                            playBinding: (item, distance) =>
+                            {
+                                const distanceVolumeEffect = Math.pow(mathRemapClamp(distance, 0, 20, 1, 0), 2)
+                                item.volume = 0.1 + Math.random() * 0.1 + distanceVolumeEffect * 0.6
+
+                                const distanceRateEffect = mathRemapClamp(distance, 0, 20, 0, - 0.3)
+                                item.rate = 1.3 + Math.random() * 0.1 + distanceRateEffect
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
+        // Distant
+        {
+            const paths = [
+                'sounds/thunder/distant/Thunder32GentleCr SIG014001.mp3',
+                'sounds/thunder/distant/Thunder44LowRippl SIG015201.mp3',
+            ]
+
+            this.sounds.distant = []
+
+            for(const path of paths)
+            {
+                this.sounds.distant.push(
+                    this.game.audio.register(
+                        'explosion',
+                        {
+                            path: path,
+                            autoplay: false,
+                            loop: false,
+                            volume: 0.4,
+                            antiSpam: 7,
+                            playBinding: (item) =>
+                            {
+                                item.volume = 1 + Math.random() * 0.3
+                                item.rate = 1 + Math.random() * 0.3
+                            }
+                        }
+                    )
+                )
+            }
+        }
     }
 
     setAnticipationParticles()
@@ -346,6 +419,11 @@ export class Lightnings
 
         gsap.delayedCall(this.anticipationParticles.duration, () =>
         {
+            const distance = Math.hypot(coordinates.x - this.game.player.position2.x, coordinates.z - this.game.player.position2.y)
+            
+            // Sound
+            this.sounds.near[Math.floor(Math.random() * this.sounds.near.length)].play(distance)
+
             // Game explosion
             this.game.explosions.explode(coordinates, 7, 4, true)
             
@@ -380,8 +458,21 @@ export class Lightnings
 
             const rng = alea(this.currentSecond)
 
+            // Normal lightning
             if(rng() < this.hitChances)
                 this.createRandom(rng)
+
+            // Distant thunder
+            else
+            {
+                const rng = alea(this.currentSecond + 999)
+                if(rng() < this.hitChances)
+                {
+                    this.sounds.distant[Math.floor(Math.random() * this.sounds.distant.length)].play()
+                }
+            }
         }
+
+        
     }
 }

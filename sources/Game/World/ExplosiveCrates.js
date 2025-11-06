@@ -55,8 +55,20 @@ export class ExplosiveCrates
             i++
         }
 
+        this.setSounds()
+
+        this.game.ticker.events.on('tick', () =>
+        {
+            this.update()
+        }, 3)
+    }
+
+    setSounds()
+    {
+        this.sounds = {}
+
         // Click sound
-        this.sound = this.game.audio.register(
+        this.sounds.click = this.game.audio.register(
             'click',
             {
                 path: 'sounds/clicks/Source Metal Clicks Delicate Light Sharp Clip Mid 07.mp3',
@@ -72,10 +84,21 @@ export class ExplosiveCrates
             }
         )
 
-        this.game.ticker.events.on('tick', () =>
-        {
-            this.update()
-        }, 3)
+        this.sounds.explosion = this.game.audio.register(
+            'explosion',
+            {
+                path: 'sounds/explosions/Explosion with Debris 01.mp3',
+                autoplay: false,
+                loop: false,
+                volume: 0.4,
+                antiSpam: 0.2,
+                playBinding: (item) =>
+                {
+                    item.volume = 0.35 + Math.random() * 0.4
+                    item.rate = 0.6 + Math.random() * 4
+                }
+            }
+        )
     }
 
     update()
@@ -88,10 +111,13 @@ export class ExplosiveCrates
             {
                 if(!isSleeping)
                 {
-                    this.sound.play()
+                    this.sounds.click.play()
 
                     gsap.delayedCall(0.4, () =>
                     {
+                        // Sound
+                        this.sounds.explosion.play()
+
                         // Explode
                         this.game.world.fireballs.create(crate.object.physical.body.translation())
 
