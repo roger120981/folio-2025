@@ -478,8 +478,20 @@ export class BowlingArea extends Area
         points.position.y = 1
         points.position.z = 0.5
         this.references.get('jukebox')[0].add(points)
+
+        // Sound
+        const sound = this.game.audio.register(
+            'jukebox',
+            {
+                path: 'sounds/jukebox/DVDPlayerChangeDisc_BW.49824.wav',
+                autoplay: false,
+                loop: false,
+                volume: 0.3,
+            }
+        )
         
         // Interactive point
+        let switching = false
         this.game.interactivePoints.create(
             this.references.get('jukeboxInteractivePoint')[0].position,
             'Change song',
@@ -487,7 +499,20 @@ export class BowlingArea extends Area
             InteractivePoints.STATE_CONCEALED,
             () =>
             {
-                console.log('change music')
+                if(switching)
+                    return
+
+                switching = true
+
+                sound.play()
+                
+                this.game.audio.playlist.current.sound.stop()
+
+                gsap.delayedCall(3, () =>
+                {
+                    switching = false
+                    this.game.audio.playlist.next()
+                })
             },
             () =>
             {

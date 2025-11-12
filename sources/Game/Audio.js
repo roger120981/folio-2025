@@ -25,11 +25,9 @@ export class Audio
     {
         this.initiated = true
 
-        this.setMusic()
+        this.setPlaylist()
         this.setAmbiants()
         this.setPunctuals()
-        
-        this.music.play()
 
         // Play all autoplays that didn't start because not initated
         this.groups.forEach((group, name) =>
@@ -132,15 +130,63 @@ export class Audio
         return item
     }
 
-    setMusic()
+    setPlaylist()
     {
-        this.music = new Howl({
-            src: ['sounds/musics/she-moved-through-the-fair-(celtic)_main-full.mp3'],
-            pool: 0,
-            autoplay: false,
-            loop: true,
-            volume: 0.15
-        })
+        this.playlist = {}
+        this.playlist.songs = []
+        this.playlist.index = -1
+        this.playlist.current = null
+        
+        const paths = [
+            'sounds/musics/Healing Native Flute 01.mp3',
+            'sounds/musics/Moonglow.mp3',
+            'sounds/musics/omaha_main-full.mp3',
+            'sounds/musics/scarborough-fair-dance_stem-04.mp3',
+        ]
+        for(const path of paths)
+        {
+            const song = {}
+            song.loaded = false
+            song.sound = new Howl({
+                src: [ path ],
+                pool: 0,
+                autoplay: false,
+                loop: false,
+                preload: false,
+                volume: 0.15,
+                onend: () =>
+                {
+                    this.playlist.next()
+                }
+            })
+            this.playlist.songs.push(song)
+        }
+
+        this.playlist.next = () =>
+        {
+            this.playlist.index++
+
+            if(this.playlist.index >= this.playlist.songs.length)
+                this.playlist.index = 0
+
+            // Old one
+            if(this.playlist.current)
+            {
+                this.playlist.current.sound.stop()
+            }
+
+            // New one
+            this.playlist.current = this.playlist.songs[this.playlist.index]
+
+            if(!this.playlist.current.loaded)
+            {
+                this.playlist.current.sound.load()
+            }
+
+            this.playlist.current.sound.play()
+        }
+
+        this.playlist.next()
     }
 
     setAmbiants()
