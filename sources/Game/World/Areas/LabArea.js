@@ -1235,8 +1235,8 @@ export class LabArea extends Area
                 colorNode: color('#a88c7f')
             })
             
-            const colorA = uniform(color('#ff8641'))
-            const colorB = uniform(color('#ff3e00'))
+            const colorA = uniform(color('#ff6b2b'))
+            const colorB = uniform(color('#ff4100'))
             const intensity = uniform(1.25)
     
             const baseOutput = material.outputNode
@@ -1255,6 +1255,16 @@ export class LabArea extends Area
 
             this.cauldron.wood = this.references.get('wood')[0]
             this.cauldron.wood.material = material
+
+            if(this.game.debug.active)
+            {
+                const debugPanel = this.debugPanel.addFolder({
+                    title: 'burning wood',
+                    expanded: false,
+                })
+                this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
+                this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
+            }
         }
 
         // Liquid
