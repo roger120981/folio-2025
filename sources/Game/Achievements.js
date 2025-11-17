@@ -34,6 +34,9 @@ export class Achievements
                 group.setProgress(progress, true)
             }
         }
+
+        this.globalProgress.update()
+        this.rewards.update()
     }
 
     setStorage()
@@ -264,8 +267,6 @@ export class Achievements
                 }
             })
         }
-
-        this.rewards.update()
     }
 
     setGroups()
@@ -419,11 +420,11 @@ export class Achievements
                 achievement.achieved = true
                 achievement.itemElement.classList.add('is-achieved')
 
-                this.globalProgress.update()
-                this.rewards.update()
-
                 if(!_silent)
                 {
+                    this.globalProgress.update()
+                    this.rewards.update()
+
                     // Confetti
                     if(this.game.world.confetti)
                     {
@@ -561,6 +562,8 @@ export class Achievements
 
     reset()
     {
+        this.game.player.distanceDriven.reset()
+
         this.groups.forEach(group =>
         {
             group.reset()

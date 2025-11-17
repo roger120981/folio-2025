@@ -335,7 +335,9 @@ export class Player
         this.distanceDriven.floored = Math.floor(this.distanceDriven.value)
         this.distanceDriven.reset = () =>
         {
-
+            localStorage.removeItem('distanceDriven')
+            this.distanceDriven.value = 0
+            this.distanceDriven.floored = 0
         }
         
     }
@@ -642,9 +644,12 @@ export class Player
         }
         
         // Achievement
-        const distanceDrivenKm = Math.floor(this.distanceDriven / 1000)
+        const distanceDrivenKm = Math.floor(this.distanceDriven.value / 1000)
 
         if(this.game.achievements.groups.get('distanceDriven') && distanceDrivenKm > this.game.achievements.groups.get('distanceDriven').progress)
+        {
             this.game.achievements.setProgress('distanceDriven', distanceDrivenKm)
+
+        }
     }
 }
