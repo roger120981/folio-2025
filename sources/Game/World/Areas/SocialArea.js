@@ -95,7 +95,7 @@ export class SocialArea extends Area
             const reference = new THREE.Object3D()
 
             reference.position.copy(this.fans.spawnerPosition)
-            reference.position.y -= 4
+            reference.position.y += 99
             references.push(reference)
             
             // Object

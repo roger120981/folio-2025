@@ -290,6 +290,9 @@ export class Objects
     {
         this.list.forEach((_object) =>
         {
+            const position = _object.physical ? _object.physical.body.translation() : null
+
+            // Apply physical to visual
             if(
                 _object.needsUpdate ||
                 (
@@ -300,8 +303,17 @@ export class Objects
                 )
             )
             {
-                _object.visual.object3D.position.copy(_object.physical.body.translation())
+                _object.visual.object3D.position.copy(position)
                 _object.visual.object3D.quaternion.copy(_object.physical.body.rotation())
+            }
+
+            // Felt in the floor
+            if(_object.physical)
+            {
+                if(position.y < this.game.water.depthElevation)
+                {
+                    this.resetObject(_object)
+                }
             }
         })
     }

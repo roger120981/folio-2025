@@ -230,8 +230,8 @@ export class Physics
     
         for(const physical of this.physicals)
         {
-            const waterDepth = Math.max(- physical.body.translation().y, this.game.water.elevation)
-            physical.body.setGravityScale(1 + waterDepth * physical.waterGravityMultiplier)
+            const waterDepth = Math.max(- physical.body.translation().y, this.game.water.surfaceElevation)
+            // physical.body.setGravityScale(1 + waterDepth * physical.waterGravityMultiplier)
 
             if(waterDepth > 0)
             {

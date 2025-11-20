@@ -204,7 +204,7 @@ export class CookieArea extends Area
             else
             {
                 reference.position.copy(this.cookies.spawnerPosition)
-                reference.position.y -= 4
+                reference.position.y += 99
             }
             references.push(reference)
             

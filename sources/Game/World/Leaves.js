@@ -246,7 +246,7 @@ export class Leaves
             position.addAssign(velocity.mul(this.game.ticker.deltaScaledUniform))
 
             // Clamp to floor / water
-            const floorY = terrainData.b.remapClamp(0.02, 0.13, 0, this.game.water.elevationUniform).add(0.02)
+            const floorY = terrainData.b.remapClamp(0.02, 0.13, 0, this.game.water.surfaceElevationUniform).add(0.02)
             position.y.assign(max(position.y, floorY))
 
             // Loop

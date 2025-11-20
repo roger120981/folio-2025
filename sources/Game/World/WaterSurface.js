@@ -384,7 +384,7 @@ export class WaterSurface
         const halfExtent = this.game.view.optimalArea.radius
         this.mesh.scale.setScalar(halfExtent * 2)
 
-        this.mesh.position.y = this.game.water.elevation
+        this.mesh.position.y = this.game.water.surfaceElevation
         this.mesh.castShadow = true
         // this.mesh.receiveShadow = true
         // this.mesh.renderOrder = -1
@@ -404,9 +404,10 @@ export class WaterSurface
         this.ice.halfThickness = 0.5
         this.ice.physical = this.game.physics.getPhysical({
             type: 'kinematicPositionBased',
-            position: new THREE.Vector3(0, this.game.water.elevation - this.ice.halfThickness, 0),
+            position: new THREE.Vector3(0, this.game.water.surfaceElevation - this.ice.halfThickness, 0),
             frictionRule: 'min',
             friction: 0.02,
+            enabled: false,
             colliders:
             [
                 { shape: 'cuboid', parameters: [ 256, this.ice.halfThickness, 256 ] },
@@ -447,6 +448,21 @@ export class WaterSurface
         // Ice
         const friction = lerp(0.5, 0.02, this.iceRatio.value)
         this.ice.physical.body.collider(0).setFriction(friction)
-        this.ice.physical.body.setNextKinematicTranslation({ x: 0, y: lerp(- 1.5 - this.ice.halfThickness, this.game.water.elevation - this.ice.halfThickness, this.iceRatio.value), z: 0})
+        this.ice.physical.body.setNextKinematicTranslation({ x: 0, y: lerp(- 1.5 - this.ice.halfThickness, this.game.water.surfaceElevation - this.ice.halfThickness, this.iceRatio.value), z: 0})
+
+        if(this.iceRatio.value > 0)
+        {
+            if(!this.ice.physical.body.isEnabled())
+            {
+                this.game.objects.enable(this.ice)
+            }
+        }
+        else
+        {
+            if(this.ice.physical.body.isEnabled())
+            {
+                this.game.objects.disable(this.ice)
+            }
+        }
     }
 }
