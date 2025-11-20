@@ -20,9 +20,8 @@ export class Menu
         this.events = new Events()
 
         this.setClose()
-        // this.setNavigation()
         this.setItems()
-        // this.preopen()
+        this.preopen()
         
         this.element.addEventListener('transitionend', () =>
         {
@@ -150,7 +149,9 @@ export class Menu
             return
         
         // Sound
-        this.game.audio.groups.get('click').play(true)
+        const sound = this.game.audio.groups.get('click')
+        if(sound)
+            sound.play(true)
 
         // Leaving item
         if(this.current)
@@ -210,7 +211,9 @@ export class Menu
             return
 
         // Sound
-        this.game.audio.groups.get('click').play(false)
+        const sound = this.game.audio.groups.get('click')
+        if(sound)
+            sound.play(false)
 
         this.element.classList.remove('is-visible')
 
@@ -228,9 +231,9 @@ export class Menu
         this.items.forEach((item) => 
         {
             // Is preopened
-            if(typeof item.element.dataset.preopen !== 'undefined')
+            if(typeof item.navigationElement.dataset.preopen !== 'undefined')
             {
-                this.open(item.name)               
+                this.open(item.name)
             }
         })
     }

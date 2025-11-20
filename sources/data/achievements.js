@@ -18,7 +18,7 @@ export default
     ],
     [
         'projects',
-        'So, you can fix the wifi?',
+        'But can you fix the wifi?',
         'Check every project in the <strong>projects</strong> area.',
         projectsData.length,
         true // Unique

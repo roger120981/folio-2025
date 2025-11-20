@@ -173,19 +173,13 @@
                         <!-- Intro -->
                         <div class="js-content content intro-content">
                             <div class="content-inner">
-                                <div class="title">Bruno's <span class="text-faded">(beta)</span></div>
-                                <p class="text">This is an <strong>unfinished</strong> version of my portfolio:</p>
-                                <p class="text text-small text-faded">
-                                    - Many features have been removed<br />
-                                    - Not optimised yet<br />
-                                    - Press T to write whispers (visible by everyone)
-                                </p>
-                                <p class="text text-faded text-align-right">
-                                    — Bruno
-                                </p>
+                                <div class="title">Bruno's Home</div>
+                                <p class="text">Welcome!</p>
+                                <p class="text">My name is Bruno and I'm a creative developer.</p>
+                                <p class="text">Please drive around to learn more about me and discover the many secrets of this world.</p>
                                 <p class="text start">
-                                    <button class="js-close button">
-                                        Start playing
+                                    <button class="js-unstuck button">
+                                        Unstuck
                                     </button>
                                     <button class="js-audio-toggle audio-toggle button is-active">
                                         <img class="audio-on" src="ui/audio/audioOn.svg">
@@ -227,92 +221,156 @@
                                         <!-- Mouse / Keyboard -->
                                         <div class="js-tabs-content-item tabs-content-item mouse-keyboard" data-tabs-name="mouse-keyboard" data-tabs-default>
                                             <div class="js-tabs-content-inner list">
-                                                <div class="column">
-                                                    <div class="list-item"><strong>WASD</strong> / <strong>ARROWS</strong></div>
-                                                    <div class="list-item"><strong>SHIFT</strong></div>
-                                                    <div class="list-item"><strong>B</strong></div>
-                                                    <div class="list-item"><strong>SPACE</strong></div>
-                                                    <div class="list-item"><strong>ENTER</strong></div>
-                                                    <div class="list-item"><strong>T</strong></div>
-                                                    <div class="list-item"><strong>R</strong></div>
-                                                    <div class="list-item"><strong>NUMPAD</strong></div>
-                                                    <div class="list-item"><strong>LEFT CLICK (DRAG)</strong></div>
-                                                    <div class="list-item"><strong>H</strong></div>
-                                                </div>
-                                                <div class="column">
-                                                    <div class="list-item">Move around</div>
-                                                    <div class="list-item">Boost</div>
-                                                    <div class="list-item">Brake</div>
-                                                    <div class="list-item">Jump</div>
-                                                    <div class="list-item">Interact</div>
-                                                    <div class="list-item">Post a whisper</div>
-                                                    <div class="list-item">Respawn</div>
-                                                    <div class="list-item">Activate hydraulics</div>
-                                                    <div class="list-item">Move camera</div>
-                                                    <div class="list-item">Honk</div>
-                                                </div>
+                                                <table>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><span class="key">WASD</span> or <span class="key">ARROWS</span></td>
+                                                            <td>Move around</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">SHIFT</span></td>
+                                                            <td>Boost</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">B</span></td>
+                                                            <td>Brake</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">SPACE</span></td>
+                                                            <td>Jump</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">ENTER</span></td>
+                                                            <td>Interact</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">T</span></td>
+                                                            <td>Post a whisper</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">R</span></td>
+                                                            <td>Respawn</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">NUMPAD</span></td>
+                                                            <td>Activate hydraulics</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">LEFT CLICK (DRAG)</span></td>
+                                                            <td>Move camera</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">H</span></td>
+                                                            <td>Honk</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
 
                                         <!-- Mobile / Tablet -->
                                         <div class="js-tabs-content-item tabs-content-item touch" data-tabs-name="touch">
                                             <div class="js-tabs-content-inner list">
-                                                <div class="column">
-                                                    <div class="list-item"><strong>One finger</strong></div>
-                                                    <div class="list-item"><strong>Two fingers</strong></div>
-                                                    <div class="list-item"><strong>Tap (on the car)</strong></div>
-                                                </div>
-                                                <div class="column">
-                                                    <div class="list-item">Move the car</div>
-                                                    <div class="list-item">Move camera / zoom</div>
-                                                    <div class="list-item">Jump</div>
-                                                </div>
+                                                <table>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><span class="key">One finger</span></td>
+                                                            <td>Move the car</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">Two fingers</span></td>
+                                                            <td>Move camera / zoom</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">Tap (on the car)</span></td>
+                                                            <td>Jump</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
 
                                         <!-- Gamepad -->
                                         <div class="js-tabs-content-item tabs-content-item gamepad" data-tabs-name="gamepad">
                                             <div class="js-tabs-content-inner list">
-                                                <div class="column">
-                                                    <div class="list-item is-gamepad-button is-xbox"><strong>B</strong></div>
-                                                    <div class="list-item is-gamepad-button is-xbox"><strong>Y</strong></div>
-                                                    <div class="list-item is-gamepad-button is-xbox"><strong>X</strong></div>
-                                                    <div class="list-item is-gamepad-button is-xbox"><strong>A</strong></div>
-                                                    <div class="list-item is-gamepad-button is-xbox"><strong>LT</strong></div>
-                                                    <div class="list-item is-gamepad-button is-xbox"><strong>RT</strong></div>
-                                                    <div class="list-item is-gamepad-button is-xbox"><strong>LB / RB</strong></div>
-
-                                                    <div class="list-item is-gamepad-button is-playstation"> <span class="gamepad-button circle"></span></div>
-                                                    <div class="list-item is-gamepad-button is-playstation"> <span class="gamepad-button triangle"></span></div>
-                                                    <div class="list-item is-gamepad-button is-playstation"> <span class="gamepad-button square"></span></div>
-                                                    <div class="list-item is-gamepad-button is-playstation"> <span class="gamepad-button cross"></span></div>
-                                                    <div class="list-item is-gamepad-button is-playstation"><strong>L2</strong></div>
-                                                    <div class="list-item is-gamepad-button is-playstation"><strong>R2</strong></div>
-                                                    <div class="list-item is-gamepad-button is-playstation"><strong>L1 / R1</strong></div>
-
-                                                    <div class="list-item"><strong>Joystick Left</strong></div>
-                                                    <div class="list-item"><strong>Joystick Left (press)</strong></div>
-                                                    <div class="list-item"><strong>Joystick Right</strong></div>
-                                                    <div class="list-item"><strong>Joystick Right (press)</strong></div>
-                                                    <div class="list-item"><strong>Select</strong></div>
-                                                    <div class="list-item"><strong>Start</strong></div>
-                                                </div>
-                                                <div class="column">
-                                                    <div class="list-item">Boost</div>
-                                                    <div class="list-item">Jump</div>
-                                                    <div class="list-item">Brake</div>
-                                                    <div class="list-item">Interact / Exit</div>
-                                                    <div class="list-item">Accelerate</div>
-                                                    <div class="list-item">Backward accelerate</div>
-                                                    <div class="list-item">Hydraulics</div>
-
-                                                    <div class="list-item">Turn wheels</div>
-                                                    <div class="list-item">Honk</div>
-                                                    <div class="list-item">Move camera</div>
-                                                    <div class="list-item">Zoom in/out</div>
-                                                    <div class="list-item">Reset</div>
-                                                    <div class="list-item">Pause</div>
-                                                </div>
+                                            
+                                                <table>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="is-gamepad-button is-xbox key">B</span>
+                                                                <span class="is-gamepad-button is-playstation is-icon circle"></span>
+                                                            </td>
+                                                            <td>Boost</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="is-gamepad-button is-xbox key">Y</span>
+                                                                <span class="is-gamepad-button is-playstation is-icon triangle"></span>
+                                                            </td>
+                                                            <td>Jump</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="is-gamepad-button is-xbox key">X</span>
+                                                                <span class="is-gamepad-button is-playstation is-icon square"></span>
+                                                            </td>
+                                                            <td>Brake</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="is-gamepad-button is-xbox key">A</span>
+                                                                <span class="is-gamepad-button is-playstation is-icon cross"></span>
+                                                            </td>
+                                                            <td>Interact / Exit</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="is-gamepad-button is-xbox key">LT</span>
+                                                                <span class="is-gamepad-button is-playstation key">L2</span>
+                                                            </td>
+                                                            <td>Accelerate</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="is-gamepad-button is-xbox key">RT</span>
+                                                                <span class="is-gamepad-button is-playstation key">R2</span>
+                                                            </td>
+                                                            <td>Backward accelerate</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="is-gamepad-button is-xbox key">LB / RB</span>
+                                                                <span class="is-gamepad-button is-playstation key">L1 / R1</span>
+                                                            </td>
+                                                            <td>Hydraulics</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">Joystick Left</span></td>
+                                                            <td>Turn wheels</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">Joystick Left (press)</span></td>
+                                                            <td>Honk</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">Joystick Right</span></td>
+                                                            <td>Move camera</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">Joystick Right (press)</span></td>
+                                                            <td>Zoom in/out</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">Select</span></td>
+                                                            <td>Reset</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">Start</span></td>
+                                                            <td>Pause</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>

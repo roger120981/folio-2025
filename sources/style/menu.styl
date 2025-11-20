@@ -85,10 +85,13 @@
             height 100%
             opacity 0
             pointer-events none
+            transition opacity 0.3s
+            transition-delay 0.3s
 
             &.is-visible
                 opacity 1
                 pointer-events auto
+                transition-delay 0s
 
     /**
      * Contents
@@ -115,10 +118,13 @@
             pointer-events none
             overflow-x hidden
             overflow-y scroll
+            transition opacity 0.3s
+            transition-delay 0s
 
             &.is-visible
                 opacity 1
                 pointer-events auto
+                transition-delay 0.1s
 
         .title
             margin-bottom 0.5em

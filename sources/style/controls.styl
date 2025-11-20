@@ -3,31 +3,22 @@
         display flex
         align-items center
         justify-content center
+        white-space nowrap
 
-        .column
-            &:first-child
+        tr
+            td:first-child
                 text-align right
                 padding-right 15px
 
-        .list-item
-            white-space nowrap
-
-            &.is-gamepad-button
-                display none
-
-                &.is-playstation
-                    .is-gamepad-default &
-                    .is-gamepad-playstation &
-                        display block
-
-                &.is-xbox
-                    .is-gamepad-xbox &
-                        display block
-
-        .gamepad-button
+        .key
             display inline-block
-            background-size cover
-            vertical-align middle
+            padding 0 4px
+            border 1px solid #ffffff33
+            border-radius 4px
+            font-weight 700
+
+        .is-gamepad-button
+            display none
 
             @media only screen and (max-width 520px)
                 transform scale(0.8, 0.8)
@@ -35,23 +26,36 @@
             @media only screen and (max-width 420px)
                 transform scale(0.7, 0.7)
 
-            &.circle
-                width 15px
-                height 15px
-                background-image url('../ui/controls/gamepad-circle.png')
+            &.is-playstation
+                .is-gamepad-default &
+                .is-gamepad-playstation &
+                    display inline-block
 
-            &.triangle
-                width 16px
-                height 15px
-                background-image url('../ui/controls/gamepad-triangle.png')
+            &.is-xbox
+                .is-gamepad-xbox &
+                    display inline-block
 
-            &.square
-                width 15px
-                height 15px
-                background-image url('../ui/controls/gamepad-square.png')
+            &.is-icon
+                background-size cover
+                vertical-align middle
+                
+                &.circle
+                    width 15px
+                    height 15px
+                    background-image url('../ui/controls/gamepad-circle.png')
 
-            &.cross
-                width 14px
-                height 13px
-                background-image url('../ui/controls/gamepad-cross.png')
-    
+                &.triangle
+                    width 16px
+                    height 15px
+                    background-image url('../ui/controls/gamepad-triangle.png')
+
+                &.square
+                    width 15px
+                    height 15px
+                    background-image url('../ui/controls/gamepad-square.png')
+
+                &.cross
+                    width 14px
+                    height 13px
+                    background-image url('../ui/controls/gamepad-cross.png')
+        
