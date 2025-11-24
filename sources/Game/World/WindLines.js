@@ -8,7 +8,7 @@ import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 
 class WindLine
 {
-    constructor(thickness = 0.1)
+    constructor(thickness = 0.1, _tangent = vec3(0, 1, -1))
     {
         this.game = Game.getInstance()
 
@@ -33,12 +33,7 @@ class WindLine
         material.vertexNode = Fn(() =>
         {
             const worldPosition = modelWorldMatrix.mul(vec4(positionGeometry, 1))
-            const toCamera = worldPosition.xyz.sub(cameraPosition).normalize()
-
-            const nextPosition = positionGeometry.add(attribute('direction'))
-            const nextWorldPosition = modelWorldMatrix.mul(vec4(nextPosition, 1))
-            const nextDelta = nextWorldPosition.xyz.sub(worldPosition.xyz).normalize()
-            const tangent = cross(nextDelta, toCamera).normalize()
+            const tangent = _tangent.normalize()
             
             const ratio = attribute('ratio')
             const baseThickness = ratio.sub(0.5).abs().mul(2).oneMinus().smoothstep(0, 1)
@@ -58,7 +53,7 @@ class WindLine
         this.mesh = new THREE.Mesh(geometry, material)
         this.mesh.renderOrder = 1
         this.mesh.position.y = 2
-        // this.game.scene.add(this.mesh)
+        this.game.scene.add(this.mesh)
     }
 }
 
@@ -75,7 +70,7 @@ export class WindLines
                 expanded: false,
             })
         }
-
+        
         this.intervalRange = { min: 300, max: 2000 }
         this.duration = 4
         this.translation = 1
