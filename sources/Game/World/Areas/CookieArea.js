@@ -138,7 +138,6 @@ export class CookieArea extends Area
         const mesh = new THREE.Mesh(geometry, material)
         mesh.position.copy(this.references.items.get('chimney')[0].position)
         mesh.count = count
-        mesh.frustumCulled = true
 
         this.game.scene.add(mesh)
 
@@ -185,10 +184,10 @@ export class CookieArea extends Area
     setCookies()
     {
         const baseCookie = this.references.items.get('cookie')[0]
-        // for(const child of baseCookie.children)
-        //     child.position.sub(baseCookie.position)
-        
-        baseCookie.removeFromParent()
+        baseCookie.position.set(0, 0, 0)
+
+        // Update materials 
+        this.game.materials.updateObject(baseCookie)
 
         this.cookies = {}
         this.cookies.spawnerPosition = this.references.items.get('spawner')[0].position

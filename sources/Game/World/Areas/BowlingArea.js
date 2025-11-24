@@ -84,7 +84,8 @@ export class BowlingArea extends Area
         const basePin = this.references.items.get('pinPhysicalDynamic')[0]
         basePin.castShadow = true
         basePin.receiveShadow = true
-        basePin.frustumCulled = true
+        basePin.position.set(0, 0, 0)
+        basePin.rotation.set(0, 0, 0)
 
         // Update materials 
         this.game.materials.updateObject(basePin)
@@ -139,9 +140,6 @@ export class BowlingArea extends Area
             i++
         }
 
-        basePin.position.set(0, 0, 0)
-        basePin.rotation.set(0, 0, 0)
-        basePin.frustumCulled = false
 
         // this.game.objects.add(
         //     {

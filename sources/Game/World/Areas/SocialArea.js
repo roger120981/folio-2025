@@ -74,7 +74,8 @@ export class SocialArea extends Area
         const baseFan = this.references.items.get('fan')[0]
         baseFan.castShadow = true
         baseFan.receiveShadow = true
-        baseFan.frustumCulled = false
+
+        baseFan.position.set(0, 0, 0)
 
         // Update materials 
         this.game.materials.updateObject(baseFan)

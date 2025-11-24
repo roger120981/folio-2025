@@ -179,7 +179,6 @@ export class LandingArea extends Area
             particles.visible = false
             particles.position.copy(position)
             particles.count = count
-            particles.frustumCulled = true
             this.game.scene.add(particles)
         }
 

@@ -101,7 +101,6 @@ export class BehindTheSceneArea extends Area
 
         // Mesh
         this.slabs = new THREE.Mesh(geometry, material)
-        this.slabs.frustumCulled = false
         this.slabs.position.copy(this.center)
         this.slabs.position.y += 0.01
         this.game.scene.add(this.slabs)
