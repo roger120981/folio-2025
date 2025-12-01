@@ -134,6 +134,12 @@ export default
         1
     ],
     [
+        'circuitLeaderboard',
+        'Early Bird gets the Worm',
+        'Make it to the leaderboard.',
+        1
+    ],
+    [
         'distanceDriven',
         'Baby step',
         'Drive 1km.',

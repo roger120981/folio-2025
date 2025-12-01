@@ -1278,6 +1278,9 @@ export class CircuitArea extends Area
                     checkpointTimings: this.checkpoints.timings
                 })
 
+                // Achievement
+                this.game.achievements.setProgress('circuitLeaderboard', 1)
+
                 // Close modal
                 this.game.modals.close()
             }
