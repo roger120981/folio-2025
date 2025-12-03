@@ -31,7 +31,7 @@ export class Floor
 
     setVisual()
     {
-        this.size = Math.round(this.game.view.optimalArea.radius * 2) + 2
+        this.size = Math.round(this.game.view.optimalArea.radius * 2) + 1
         this.halfSize = this.size * 0.5
         this.cellSize = 1.5
         this.subdivisions = this.size / this.cellSize

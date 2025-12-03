@@ -209,7 +209,11 @@ export class View
             const savedQuaternion = this.defaultCamera.quaternion.clone()
 
             // Reset with max radius
-            const radiusMax = this.spherical.radius.edges.max + this.ratioOverflow * this.spherical.radius.nonIdealRatioOffset
+            let radiusMax = (this.spherical.radius.edges.max + this.ratioOverflow * this.spherical.radius.nonIdealRatioOffset)
+
+            if(this.game.quality.level === 0)
+                radiusMax *= 1 - this.zoom.speedAmplitude
+            
             const offset = new THREE.Vector3()
             offset.setFromSphericalCoords(radiusMax, this.spherical.phi, this.spherical.theta)
 
