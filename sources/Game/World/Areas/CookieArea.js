@@ -292,10 +292,11 @@ export class CookieArea extends Area
     setCounter()
     {
         this.counter = {}
-        this.counter.value = 11
+        this.counter.value = 0
         this.counter.panel = this.references.items.get('counterPanel')[0]
         this.counter.texture = null
         this.counter.initialised = false
+        this.counter.maxScale = 0
 
         /**
          * Canvas
@@ -325,13 +326,8 @@ export class CookieArea extends Area
 
             this.counter.initialised = true
 
-            // Format value
-            const formatedValue = this.counter.value.toLocaleString('en-US')
-            
             // Texture
-            const textSize = context.measureText(`${formatedValue}00`)
-            const width = Math.ceil(textSize.width) + 2
-            canvas.width = width
+            canvas.width = 256
             canvas.height = height
 
             this.counter.texture = new THREE.Texture(canvas)
@@ -355,19 +351,18 @@ export class CookieArea extends Area
             mesh.quaternion.copy(this.references.items.get('counterLabel')[0].quaternion)
             mesh.receiveShadow = true
             mesh.scale.y = 0.75
-            mesh.scale.x = 0.75 * width / height
+            mesh.scale.x = canvas.width / canvas.height * 0.75
             this.game.scene.add(mesh)
 
-            // Panel
-            this.counter.panel.scale.x = width / 105
-
             // First update
+            this.counter.update()
             this.counter.update()
         }
 
         this.counter.add = () =>
         {
             this.counter.value++
+            // this.counter.value *= 2
             this.throttleAmount++
             this.counter.update()
         }
@@ -377,9 +372,13 @@ export class CookieArea extends Area
             if(!this.counter.initialised)
                 return
 
-            const formatedValue = this.counter.value.toLocaleString("en-US")
+            const formatedValue = this.counter.value.toLocaleString('en-US')
             
             // Canvas
+            const textSize = context.measureText(formatedValue)
+            const width = Math.ceil(textSize.width) + 30
+            const scale = width / 105
+
             context.fillStyle = '#000000'
             context.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -388,6 +387,12 @@ export class CookieArea extends Area
             context.textAlign = 'center'
             context.textBaseline = 'middle'
             context.fillText(formatedValue, canvas.width / 2, canvas.height * 0.5 + textOffsetVertical)
+
+            if(scale > this.counter.maxScale)
+            {
+                this.counter.maxScale = scale
+                this.counter.panel.scale.x = scale
+            }
 
             this.counter.texture.needsUpdate = true
         }
