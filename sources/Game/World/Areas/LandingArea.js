@@ -224,17 +224,20 @@ export class LandingArea extends Area
             {
                 this.game.reset()
 
-                // Bonfire
-                particles.visible = true
-                burn.visible = true
-                this.game.ticker.wait(2, () =>
+                gsap.delayedCall(2, () =>
                 {
-                    particles.geometry.boundingSphere.center.y = 2
-                    particles.geometry.boundingSphere.radius = 2
-                })
+                    // Bonfire
+                    particles.visible = true
+                    burn.visible = true
+                    this.game.ticker.wait(2, () =>
+                    {
+                        particles.geometry.boundingSphere.center.y = 2
+                        particles.geometry.boundingSphere.radius = 2
+                    })
 
-                // Sound
-                this.game.audio.groups.get('campfire').items[0].positions.push(position)
+                    // Sound
+                    this.game.audio.groups.get('campfire').items[0].positions.push(position)
+                })
             },
             () =>
             {
