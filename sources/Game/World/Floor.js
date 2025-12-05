@@ -155,18 +155,20 @@ export class Floor
     setBedRock()
     {
         this.bedRock = {}
-        this.bedRock.halfExtent = 0.5
+        this.bedRock.halfHeight = 0.5
+        this.bedRock.halfWidth = 6
+        this.bedRock.enabled = false
 
 
         this.bedRock.physical = this.game.physics.getPhysical({
             type: 'kinematicPositionBased',
-            position: new THREE.Vector3(0, this.game.water.depthElevation - this.bedRock.halfExtent, 0),
+            position: new THREE.Vector3(0, this.game.water.depthElevation - this.bedRock.halfHeight, 0),
             frictionRule: 'min',
             friction: 0.5,
             enabled: true,
             colliders:
             [
-                { shape: 'cuboid', parameters: [ 10, this.bedRock.halfExtent, 10 ] },
+                { shape: 'cuboid', parameters: [ this.bedRock.halfWidth, this.bedRock.halfHeight, this.bedRock.halfWidth ] },
             ]
         })
     }
@@ -177,13 +179,32 @@ export class Floor
         this.mesh.position.z = Math.round(this.game.view.optimalArea.position.z / this.cellSize) * this.cellSize
 
         // Bedrock
-        const x = Math.round(this.game.player.position.x)
-        const z = Math.round(this.game.player.position.z)
-        this.bedRock.physical.body.setNextKinematicTranslation({
-            x,
-            y: this.game.water.depthElevation - this.bedRock.halfExtent,
-            z
-        })
-        this.bedRock.physical.body.setLinvel({ x: 1, y: 0, z: 0 })
+        if(
+            Math.abs(this.game.player.position.x) > this.game.terrain.size / 2 - this.bedRock.halfWidth ||
+            Math.abs(this.game.player.position.z) > this.game.terrain.size / 2 - this.bedRock.halfWidth
+        )
+        {
+            if(!this.bedRock.enabled)
+            {
+                this.bedRock.enabled = true
+                this.bedRock.physical.body.setEnabled(true)
+            }
+            const x = Math.round(this.game.player.position.x)
+            const z = Math.round(this.game.player.position.z)
+            this.bedRock.physical.body.setNextKinematicTranslation({
+                x,
+                y: this.game.water.depthElevation - this.bedRock.halfHeight,
+                z
+            })
+            this.bedRock.physical.body.setLinvel({ x: 0, y: 0, z: 0 })
+        }
+        else
+        {
+            if(this.bedRock.enabled)
+            {
+                this.bedRock.enabled = false
+                this.bedRock.physical.body.setEnabled(false)
+            }
+        }
     }
 }
