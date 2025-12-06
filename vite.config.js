@@ -28,6 +28,6 @@ export default {
         topLevelAwait(),
         restart({ restart: [ '../static/**', ] }), // Restart server on static file change
         nodePolyfills(),
-        process.env.VITE_SSL ? basicSsl() : null,
+        // basicSsl()
     ]
 }
