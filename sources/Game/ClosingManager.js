@@ -1,4 +1,5 @@
 import { Game } from './Game.js'
+import { Inputs } from './Inputs/Inputs.js'
 import { Menu } from './Menu.js'
 import { Modals } from './Modals.js'
 import { CircuitArea } from './World/Areas/CircuitArea.js'
@@ -34,7 +35,7 @@ export class ClosingManager
                     this.game.modals.close()
                 
                 // Menu open => Close
-                else if(this.game.menu.state === Menu.OPEN || this.game.menu.state === Menu.OPENING)
+                else if(this.game.menu.state === Menu.OPEN || (this.game.inputs.mode !== Inputs.MODE_GAMEPAD && this.game.menu.state === Menu.OPENING))
                     this.game.menu.close()
 
                 // Circuit running
@@ -42,11 +43,11 @@ export class ClosingManager
                     this.game.menu.open('circuit')
 
                 // Projects => Close
-                else if(this.game.world.areas?.projects && this.game.world.areas?.projects.state === ProjectsArea.STATE_OPEN || this.game.world.areas?.projects.state === ProjectsArea.STATE_OPENING)
+                else if(this.game.world.areas?.projects && (this.game.world.areas?.projects.state === ProjectsArea.STATE_OPEN || this.game.world.areas?.projects.state === ProjectsArea.STATE_OPENING))
                     this.game.world.areas.projects.close()
 
                 // Lab => Close
-                else if(this.game.world.areas?.lab && this.game.world.areas?.lab.state === LabArea.STATE_OPEN || this.game.world.areas?.lab.state === LabArea.STATE_OPENING)
+                else if(this.game.world.areas?.lab && (this.game.world.areas?.lab.state === LabArea.STATE_OPEN || this.game.world.areas?.lab.state === LabArea.STATE_OPENING))
                     this.game.world.areas.lab.close()
 
                 // Nothing opened and used the keyboard Escape key => Open default modal

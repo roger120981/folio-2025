@@ -23,6 +23,7 @@ export class Menu
         this.setTrigger()
         this.setClose()
         this.setItems()
+        this.setGamepad()
         this.preopen()
         
         this.element.addEventListener('transitionend', () =>
@@ -124,6 +125,43 @@ export class Menu
             if(this.default === null)
                 this.default = item
         }
+
+        const keys = [...this.items.keys()]
+
+        for(let i = 0; i < keys.length; i++)
+        {
+            const prevName = keys[i - 1 < 0 ? keys.length - 1 : i - 1]
+            const nextName = keys[(i + 1) % keys.length]
+            const item = this.items.get(keys[i])
+
+            item.prevName = prevName
+            item.nextName = nextName
+        }
+    }
+
+    setGamepad()
+    {
+        this.game.inputs.addActions([
+            { name: 'next', categories: [ 'menu' ], keys: [ 'Gamepad.r1' ] },
+            { name: 'prev', categories: [ 'menu' ], keys: [ 'Gamepad.l1' ] }
+        ])
+
+        // Respawn
+        this.game.inputs.events.on('next', (action) =>
+        {
+            if(action.active)
+            {
+                this.open(this.current.nextName)
+            }
+        })
+        this.game.inputs.events.on('prev', (action) =>
+        {
+            if(action.active)
+            {
+                this.open(this.current.prevName)
+            }
+        })
+
     }
 
     open(name = null)
