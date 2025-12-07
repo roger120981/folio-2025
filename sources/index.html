@@ -84,6 +84,14 @@
             </div>
         </button>
 
+        <!-- Map trigger -->
+        <button class="js-map-trigger map-trigger">
+            <div class="button-inner">
+                <div class="icon-container">
+                    <img class="map-icon" src="ui/map.svg">
+                </div>
+            </div>
+        </button>
 
         <!-- Menu -->
         <div class="js-menu menu">
@@ -350,6 +358,14 @@
                                                         <tr>
                                                             <td><span class="key">ENTER</span></td>
                                                             <td>Interact</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">M</span></td>
+                                                            <td>Map</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><span class="key">L</span></td>
+                                                            <td>Mute</td>
                                                         </tr>
                                                         <tr>
                                                             <td><span class="key">T</span></td>
@@ -721,7 +737,7 @@
         <div class="js-modals modals">
 
             <!-- Circuit end -->
-            <div class="js-modal modal circuit-end is-simple" data-name="circuit-end">
+            <div class="js-modal modal circuit-end" data-name="circuit-end">
                 <div class="container">
                     <div class="content">
                         <button class="js-close close">
@@ -791,7 +807,7 @@
             </div>
 
             <!-- Discord -->
-            <div class="js-modal modal discord is-simple" data-name="discord">
+            <div class="js-modal modal discord" data-name="discord">
                 <div class="container">
                     <div class="content">
                         <button class="js-close close">
@@ -831,6 +847,24 @@
                         </div>
                     
                     </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="js-modal modal map" data-name="map">
+
+                <button class="js-close close">
+                    <div class="button-inner">
+                        <div class="icon-container">
+                            <img class="icon is-default" src="ui/close.svg">
+                            <span class="icon is-xbox">A</span>
+                        </div>
+                    </div>
+                </button>
+
+                <div class="js-map-container map-container">
+                    <img class="texture" src="ui/map/map-day.png" loading="lazy">
+                    <div class="js-player player"></div>
                 </div>
             </div>
 

@@ -47,6 +47,7 @@ import { Title } from './Title.js'
 import { PreRenderer } from './PreRenderer.js'
 import { Options } from './Options.js'
 import gsap from 'gsap'
+import { Map } from './Map.js'
 
 export class Game
 {
@@ -183,6 +184,7 @@ export class Game
         this.konamiCode = new KonamiCode()
         this.achievements = new Achievements()
         this.tornado = new Tornado()
+        this.map = new Map()
         this.title = new Title()
         // this.monitoring = new Monitoring()
         this.world.init(1)

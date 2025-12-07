@@ -1,0 +1,167 @@
+import { Game } from './Game.js'
+
+export class Map
+{
+    constructor()
+    {
+        this.game = Game.getInstance()
+
+        this.initiated = false
+        this.modal = this.game.modals.items.get('map')
+        this.element = this.modal.element.querySelector('.js-map-container')
+
+        this.setTrigger()
+        this.setInputs()
+
+        this.modal.events.on('open', () =>
+        {
+            if(!this.initiated)
+                this.init()
+        })
+    }
+
+    init()
+    {
+        this.initiated = true
+        
+        this.setLocations()
+        this.setPlayer()
+
+        this.game.ticker.events.on('tick', () =>
+        {
+            this.update()
+        }, 14)
+    }
+
+    setLocations()
+    {
+        this.locations = {}
+        this.locations.items = [
+            { name: 'Achievements', respawnName: 'achievements', offset: { x: 0, y: -0.02 } },
+            { name: 'Altar', respawnName: 'altar', offset: { x: 0, y: -0.03 } },
+            { name: 'Behind the scene', respawnName: 'behindTheScene', offset: { x: 0.02, y: 0 } },
+            { name: 'Bowling', respawnName: 'bowling', offset: { x: -0.08, y: 0.03 } },
+            { name: 'Career', respawnName: 'career', offset: { x: 0, y: -0.05 } },
+            { name: 'Circuit', respawnName: 'circuit', offset: { x: -0.08, y: -0.05 } },
+            { name: 'Cookie', respawnName: 'cookie', offset: { x: -0.02, y: -0.01 } },
+            { name: 'Lab', respawnName: 'lab', offset: { x: -0.02, y: 0 } },
+            { name: 'Landing', respawnName: 'landing', offset: { x: 0.02, y: 0 } },
+            { name: 'Projects', respawnName: 'projects', offset: { x: 0, y: -0.01 } },
+            { name: 'Social', respawnName: 'social', offset: { x: -0.01, y: -0.04 } },
+        ]
+
+        for(const item of this.locations.items)
+        {
+            const respawn = this.game.respawns.getByName(item.respawnName)
+            const mapPosition = this.worldToMap(respawn.position)
+
+            // HTML
+            const html = /* html */`
+                <div class="pin"></div>
+                <div class="name-container">
+                    <div class="name">${item.name}</div>
+                </div>
+            `
+
+            const element = document.createElement('div')
+            element.classList.add('location')
+            element.innerHTML = html
+            element.style.left = `${(mapPosition.x + item.offset.x)* 100}%`
+            element.style.top = `${(mapPosition.y + item.offset.y)* 100}%`
+            
+            this.element.append(element)
+
+            element.addEventListener('click', () =>
+            {
+                this.game.player.respawn(item.respawnName, () =>
+                {
+                    this.game.view.focusPoint.isTracking = true
+                })
+                this.game.modals.close()
+            })
+        }
+    }
+    // achievements
+    // altar
+    // behindTheScene
+    // bowling
+    // career
+    // circuit
+    // cookie
+    // lab
+    // landing
+    // projects
+    // social
+    // toilet
+    setPlayer()
+    {
+        this.player = {}
+        this.player.element = this.element.querySelector('.js-player')
+        this.player.roundedPosition = { x: 0, y: 0 }
+    }
+
+    setTrigger()
+    {
+        const element = this.game.domElement.querySelector('.js-map-trigger')
+        
+        element.addEventListener('click', () =>
+        {
+            this.game.modals.open('map')
+        })
+    }
+
+    setInputs()
+    {
+        // Inputs keyboard
+        this.game.inputs.addActions([
+            { name: 'map', categories: [ 'intro', 'modal', 'menu', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.m', 'Keyboard.KeyM' ] },
+        ])
+        this.game.inputs.events.on('map', (action) =>
+        {
+            if(action.active)
+            {
+                if(!this.modal.isOpen)
+                    this.game.modals.open('map')
+                else
+                    this.game.modals.close()
+            }
+        })
+    }
+
+    worldToMap(coordinates)
+    {
+        let x = coordinates.x
+        let y = typeof coordinates.z !== 'undefined' ? coordinates.z : coordinates.y
+
+        x /= this.game.terrain.size
+        y /= this.game.terrain.size
+
+        x += 0.5
+        y += 0.5
+
+        return { x, y }
+    }
+
+    update()
+    {
+        if(!this.modal.isOpen)
+            return
+
+        const playerRoundedX = Math.round(this.game.player.position.x)
+        const playerRoundedY = Math.round(this.game.player.position.z)
+
+        if(playerRoundedX !== this.player.roundedPosition.x || playerRoundedY !== this.player.roundedPosition.y)
+        {
+            this.player.roundedPosition.x = playerRoundedX
+            this.player.roundedPosition.y = playerRoundedY
+
+            const playerCoordinates = this.worldToMap(this.player.roundedPosition)
+            const x = Math.round(playerCoordinates.x * 1000) / 10
+            const y = Math.round(playerCoordinates.y * 1000) / 10
+
+            this.player.element.style.left = `${x}%`
+            this.player.element.style.top = `${y}%`
+            this.player.element.style.transform = `rotate(${-this.game.physicalVehicle.yRotation}rad)`
+        }
+    }
+}

@@ -1,30 +1,41 @@
 .menu-trigger
+    display block
     position absolute
     right 0
     top 20px
     width 44px
     height 44px
     z-index 9
-    display none
-
-    html.is-mode-touch &
-        display block
 
     html.input-filter-menu &
+    html.input-filter-modal &
     html.input-filter-cinematic &
     html.input-filter-intro &
         pointer-events none
 
+    --hover-translate 4px
+
+    html:not(.is-mode-touch) &:hover
+        .button-inner
+            transform translateX(-4px)
+
+            &::after
+                opacity 0.8
+
+            .icon-container
+                opacity 1
+
     .button-inner
         position absolute
         top 0
-        right 0
-        width 100%
+        left 0
+        width calc(100% + var(--hover-translate))
         height 100%
         background radial-gradient(ellipse at top right, #C21515, #46123B)
         transition transform 0.15s 0.15s
 
         html.input-filter-menu &,
+        html.input-filter-modal &,
         html.input-filter-intro &
         html.input-filter-cinematic &
             transform translateX(100%)

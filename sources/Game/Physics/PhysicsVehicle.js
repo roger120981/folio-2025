@@ -530,8 +530,9 @@ export class PhysicsVehicle
         this.goingForward = this.forwardRatio > 0.5
         this.forwardSpeed = this.speed * this.forwardRatio
 
-        this.zRotation = new THREE.Euler().setFromQuaternion(this.quaternion, 'ZYX').z
         this.xRotation = new THREE.Euler().setFromQuaternion(this.quaternion, 'XYZ').x
+        this.yRotation = new THREE.Euler().setFromQuaternion(this.quaternion, 'YXZ').y
+        this.zRotation = new THREE.Euler().setFromQuaternion(this.quaternion, 'ZYX').z
 
         if(Math.abs(this.game.player.accelerating) > 0.5)
             this.stuck.accumulate(this.velocity.length(), this.game.ticker.deltaScaled)

@@ -680,7 +680,7 @@ export class Audio
 
         // Inputs keyboard
         this.game.inputs.addActions([
-            { name: 'mute', categories: [ 'intro', 'modal', 'menu', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.m' ] },
+            { name: 'mute', categories: [ 'intro', 'modal', 'menu', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.l' ] },
         ])
         this.game.inputs.events.on('mute', (action) =>
         {
