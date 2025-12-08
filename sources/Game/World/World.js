@@ -35,7 +35,7 @@ export class World
     {
         this.game = Game.getInstance()
 
-        this.init(0)
+        this.step(0)
 
         // this.setAxesHelper()
         // this.setCollisionGroupsTest()
@@ -44,7 +44,7 @@ export class World
         // this.setTestShadow()
     }
 
-    init(step)
+    step(step)
     {
         if(step === 0)
         {
@@ -82,7 +82,6 @@ export class World
         else if(step === 2)
         {
             this.whispers = new Whispers()
-            // this.setPhysicalFloor()
         }
     }
 
@@ -104,11 +103,11 @@ export class World
     setTestKtx()
     {
         const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(4, 4, 4),
+            new THREE.BoxGeometry(10, 10, 10),
             new THREE.MeshBasicNodeMaterial(),
         )
         mesh.material.outputNode = vec4(
-            texture(this.game.resources.testTexture).rgb,
+            texture(this.game.resources.paletteTexture).rgb,
             1
         )
         mesh.position.copy(this.game.player.position)
