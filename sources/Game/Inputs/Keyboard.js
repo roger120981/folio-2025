@@ -20,7 +20,8 @@ export default class Keyboard
         // Key down event
         addEventListener('keydown', (_event) =>
         {
-            if(document.activeElement.matches('input, textarea, [contenteditable]'))
+            // On input, but not Escape key
+            if(document.activeElement.matches('input, textarea, [contenteditable]') && _event.code !== 'Escape')
                 return
                 
             this.pressed.push(_event.code, _event.key)
